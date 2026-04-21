@@ -10,3 +10,19 @@ __pycache__/
 *.pyc
 *.pyo
 .env
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Node / frontend build artifacts
+node_modules/
+dist/
+.vite/
+*.log
+npm-debug.log*
+
+# Editors / OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

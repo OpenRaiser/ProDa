@@ -1,0 +1,269 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ───── Theme tokens ─────
+ * Full IDE palette expressed as CSS variables. Every shell + page surface /
+ * text / hover / border / selection refers to --vs-* vars so theme switch
+ * re-skins the entire UI. Semantic colors (success/error/warning/etc.) are
+ * kept literal — they carry meaning and look wrong if themed.
+ */
+
+:root,
+:root[data-theme="dark-plus"] {
+  --vs-bg:          #1e1e1e;
+  --vs-bg-elevated: #252526;
+  --vs-sidebar:     #252526;
+  --vs-panel:       #2d2d30;
+  --vs-border:      #3c3c3c;
+  --vs-border-soft: #252526;
+  --vs-hover:       #2a2d2e;
+  --vs-selected:    #37373d;
+  --vs-accent-bg:   #094771;
+
+  --vs-fg:          #cccccc;
+  --vs-fg-strong:   #ffffff;
+  --vs-fg-heading:  #bbbbbb;
+  --vs-fg-muted:    #9d9d9d;
+  --vs-fg-subtle:   #6e6e6e;
+
+  --vs-accent:      #3794ff;
+  --vs-accent-2:    #c586c0;
+  --vs-statusbar:   #007acc;
+  --vs-statusbar-offline: #a1260d;
+
+  --vs-btn-bg:       #0e639c;
+  --vs-btn-hover:    #1177bb;
+  --vs-btn-secondary: #3a3d41;
+  --vs-btn-secondary-hover: #45494e;
+  --vs-input-bg:     #3c3c3c;
+
+  /* Scrollbar colors */
+  --vs-scrollbar-thumb: #424242;
+  --vs-scrollbar-thumb-hover: #4f4f4f;
+
+  color-scheme: dark;
+}
+
+:root[data-theme="light-plus"] {
+  --vs-bg:          #ffffff;
+  --vs-bg-elevated: #f8f8f8;
+  --vs-sidebar:     #f3f3f3;
+  --vs-panel:       #ececec;
+  --vs-border:      #cccccc;
+  --vs-border-soft: #e5e5e5;
+  --vs-hover:       #e5e8ee;
+  --vs-selected:    #0060c0;
+  --vs-accent-bg:   #0060c0;
+
+  --vs-fg:          #1f1f1f;
+  --vs-fg-strong:   #1f1f1f;
+  --vs-fg-heading:  #1f1f1f;
+  --vs-fg-muted:    #5a5a5a;
+  --vs-fg-subtle:   #8c8c8c;
+
+  --vs-accent:      #0078d4;
+  --vs-accent-2:    #8e4ec6;
+  --vs-statusbar:   #0078d4;
+  --vs-statusbar-offline: #a1260d;
+
+  --vs-btn-bg:       #0078d4;
+  --vs-btn-hover:    #106ebe;
+  --vs-btn-secondary: #e5e5e5;
+  --vs-btn-secondary-hover: #cccccc;
+  --vs-input-bg:     #ffffff;
+
+  --vs-scrollbar-thumb: #c1c1c1;
+  --vs-scrollbar-thumb-hover: #a8a8a8;
+
+  color-scheme: light;
+}
+
+:root[data-theme="one-dark"] {
+  --vs-bg:          #282c34;
+  --vs-bg-elevated: #21252b;
+  --vs-sidebar:     #21252b;
+  --vs-panel:       #2c313c;
+  --vs-border:      #181a1f;
+  --vs-border-soft: #21252b;
+  --vs-hover:       #2c313a;
+  --vs-selected:    #3e4451;
+  --vs-accent-bg:   #2c5a8c;
+
+  --vs-fg:          #abb2bf;
+  --vs-fg-strong:   #ffffff;
+  --vs-fg-heading:  #abb2bf;
+  --vs-fg-muted:    #7f848e;
+  --vs-fg-subtle:   #5c6370;
+
+  --vs-accent:      #61afef;
+  --vs-accent-2:    #c678dd;
+  --vs-statusbar:   #21252b;
+  --vs-statusbar-offline: #be5046;
+
+  --vs-btn-bg:       #528bff;
+  --vs-btn-hover:    #6c9cff;
+  --vs-btn-secondary: #3e4451;
+  --vs-btn-secondary-hover: #4b5263;
+  --vs-input-bg:     #1e2127;
+
+  --vs-scrollbar-thumb: #4b5263;
+  --vs-scrollbar-thumb-hover: #6c7688;
+
+  color-scheme: dark;
+}
+
+@layer base {
+  html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background-color: var(--vs-bg);
+    color: var(--vs-fg);
+    font-family:
+      "Segoe UI",
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      Inter,
+      "Helvetica Neue",
+      sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background-color: color-mix(in srgb, var(--vs-accent) 35%, transparent);
+  }
+
+  /* VSCode-style thin scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--vs-scrollbar-thumb);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    border-radius: 6px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--vs-scrollbar-thumb-hover);
+    background-clip: padding-box;
+    border: 2px solid transparent;
+  }
+
+  input, textarea, select {
+    font-family: inherit;
+  }
+
+  button {
+    font-family: inherit;
+  }
+
+  /* Focus ring matches accent */
+  *:focus-visible {
+    outline: 1px solid var(--vs-accent);
+    outline-offset: -1px;
+  }
+}
+
+@layer components {
+  .vs-btn {
+    @apply px-3 py-[5px] text-[13px] rounded-sm transition-colors text-white
+           disabled:cursor-not-allowed;
+    background-color: var(--vs-btn-bg);
+  }
+  .vs-btn:hover {
+    background-color: var(--vs-btn-hover);
+  }
+  .vs-btn:disabled {
+    background-color: var(--vs-hover);
+    color: var(--vs-fg-subtle);
+  }
+
+  .vs-btn-secondary {
+    @apply px-3 py-[5px] text-[13px] rounded-sm transition-colors
+           disabled:cursor-not-allowed;
+    background-color: var(--vs-btn-secondary);
+    color: var(--vs-fg);
+  }
+  .vs-btn-secondary:hover {
+    background-color: var(--vs-btn-secondary-hover);
+  }
+  .vs-btn-secondary:disabled {
+    background-color: var(--vs-hover);
+    color: var(--vs-fg-subtle);
+  }
+
+  .vs-btn-ghost {
+    @apply px-2 py-1 text-[13px] rounded-sm transition-colors;
+    color: var(--vs-fg);
+  }
+  .vs-btn-ghost:hover {
+    background-color: var(--vs-hover);
+  }
+
+  .vs-input {
+    @apply w-full px-2 py-[5px] text-[13px] rounded-sm;
+    background-color: var(--vs-input-bg);
+    border: 1px solid var(--vs-border);
+    color: var(--vs-fg);
+  }
+  .vs-input:focus {
+    border-color: var(--vs-accent);
+    outline: none;
+  }
+  .vs-input::placeholder {
+    color: var(--vs-fg-subtle);
+  }
+
+  .vs-label {
+    @apply block text-[11px] uppercase tracking-wider mb-1;
+    color: var(--vs-fg-muted);
+  }
+  .vs-panel-title {
+    @apply text-[11px] uppercase tracking-wider font-semibold;
+    color: var(--vs-fg-heading);
+  }
+  .vs-card {
+    @apply rounded-sm;
+    background-color: var(--vs-bg-elevated);
+    border: 1px solid var(--vs-border);
+  }
+  .vs-tree-item {
+    @apply flex items-center gap-1.5 px-2 py-[3px] text-[13px]
+           cursor-pointer select-none whitespace-nowrap;
+    color: var(--vs-fg);
+  }
+  .vs-tree-item:hover {
+    background-color: var(--vs-hover);
+  }
+  .vs-tree-item-active {
+    background-color: var(--vs-selected);
+    color: #ffffff;
+  }
+  .vs-divider {
+    border-top: 1px solid var(--vs-border);
+  }
+
+  /* TitleBar buttons — subtle hover that works in both light and dark */
+  .titlebar-btn {
+    @apply transition-colors;
+  }
+  .titlebar-btn:hover {
+    background-color: color-mix(in srgb, var(--vs-fg) 12%, transparent);
+  }
+  .titlebar-btn-active {
+    background-color: color-mix(in srgb, var(--vs-fg) 18%, transparent);
+    color: var(--vs-fg-strong);
+  }
+}

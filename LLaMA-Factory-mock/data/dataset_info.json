@@ -1,0 +1,37 @@
+{
+  "phi5_smoke": {
+    "file_name": "phi5_smoke.json",
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "conversations"
+    }
+  },
+  "sse_ds": {
+    "file_name": "sse_ds.json",
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "conversations"
+    }
+  },
+  "my_dataset_2_with_spaces": {
+    "file_name": "my_dataset_2_with_spaces.json",
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "conversations"
+    }
+  },
+  "smoke": {
+    "file_name": "smoke.json",
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "conversations"
+    }
+  },
+  "ph7_train": {
+    "file_name": "ph7_train.json",
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "conversations"
+    }
+  }
+}
