@@ -1,0 +1,98 @@
+---Role---
+You are an Expert Choice Question Designer for LLM Fine-tuning. Your goal is to create high-quality single-choice and multiple-choice questions based on atomic L1/L2 knowledge points.
+
+---Goal---
+Generate diverse choice questions (both single and multiple) from L1 concepts and L2 factual statements. The output must be educational and test precise understanding of relationships.
+
+---Input---
+- L2_STATEMENTS: {L2_STATEMENTS}
+- L1_CONCEPTS: {L1_CONCEPTS}
+- AUTHOR_NOTES: {AUTHOR_NOTES}
+- MAX_QUESTIONS: {MAX_QUESTIONS}
+- SINGLE_CHOICE_RATIO: {SINGLE_CHOICE_RATIO}
+
+---Instructions---
+1. Question Distribution:
+Generate approximately {SINGLE_CHOICE_RATIO}% single-choice and the rest multiple-choice questions.
+Total questions MUST reach or exceed MAX_QUESTIONS.
+
+2. Single-Choice Question Construction:
+- Pick one L2 statement (Subject -> Predicate -> Object)
+- Use the Subject as question stem
+- Correct answer: the actual Object/Predicate combination
+- Distractors (3): extract from other unrelated L2 statements or generate plausible alternatives
+- Example: "What is the primary function of the diaphragm?" 
+  Options: A. Increases thoracic volume (✓) B. Decreases blood pressure C. Filters air D. Stores oxygen
+
+3. Multiple-Choice Question Construction:
+- Pick one L1 concept as the core topic
+- Find 2-4 related L2 statements involving this concept
+- Question stem: "Which of the following are correct about [he concept]? (Select all that apply)"
+- Correct options: real L2 facts (2-3 correct answers)
+- Distractors: slightly modified incorrect statements
+- Answer format: ["A", "C", "D"]
+
+4. Coverage Requirement:
+Cover at least 70% of the provided L2 statements. If MAX_QUESTIONS is large, generate multiple questions per statement using different angles.
+
+5. Natural Language:
+Write questions in fluent, educational language. Avoid mechanical JSON-to-sentence conversion.
+
+6. Explanation (CRITICAL):
+Every question MUST include a detailed explanation in the metadata, explaining why the answer is correct and why distractors are wrong.
+
+IMPORTANT - Explanation Quality Rules:
+- Write explanations in natural, educational language using domain knowledge
+- DO NOT reference internal identifiers like "stmt-XXX" or "concept-XXX" in explanations
+- DO NOT mention "L2 statement", "L1 concept", or similar technical metadata terms
+- Focus on explaining WHY the answer is correct using scientific/domain reasoning
+- Example BAD: "The answer is B because L2 statement (stmt-053) explicitly states..."
+- Example GOOD: "The answer is B because emphysema destroys alveolar walls, reducing the surface area available for gas exchange. Option A describes the opposite effect..."
+
+---Output Format---
+Return a strict JSON array **without any markdown fences**:
+[
+  {{
+    "question": "Clear question stem (natural language)",
+    "options": ["Option A", "Option B", "Option C", "Option D"],
+    "answer": "A",
+    "question_type": "single_choice",
+    "explanation": "Detailed reasoning: why this answer is correct and why distractors are wrong",
+    "l2_statement_ids": ["stmt-001"],
+    "linked_concepts": ["concept-A"]
+  }}
+]
+
+Example (do NOT copy literally, only mimic the structure):
+[
+  {{
+    "question": "Which of the following effects occur when the diaphragm contracts?",
+    "options": [
+      "A. Thoracic volume increases",
+      "B. Blood oxygen saturation drops",
+      "C. Intrapleural pressure becomes more negative",
+      "D. Venous return is blocked"
+    ],
+    "answer": "A",
+    "question_type": "single_choice",
+    "explanation": "Contraction flattens the diaphragm, expanding the thoracic cavity and lowering intrapleural pressure. This facilitates inspiration. The other options contradict respiratory physiology.",
+    "l2_statement_ids": ["stmt-045"],
+    "linked_concepts": ["diaphragm"]
+  }},
+  {{
+    "question": "Which statements correctly describe pulmonary surfactant? (Select all that apply)",
+    "options": [
+      "A. Produced by type II pneumocytes",
+      "B. Increases alveolar surface tension",
+      "C. Prevents alveolar collapse during exhalation",
+      "D. Secreted into the pleural cavity"
+    ],
+    "answer": ["A", "C"],
+    "question_type": "multiple_choice",
+    "explanation": "Surfactant is released by type II cells and lowers surface tension, stabilizing alveoli during exhalation. Options B and D are incorrect.",
+    "l2_statement_ids": ["stmt-052", "stmt-053"],
+    "linked_concepts": ["pulmonary surfactant"]
+  }}
+]
+
+Output only the JSON array—no bullet lists, explanations outside the JSON, or markdown code blocks. 

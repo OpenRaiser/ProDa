@@ -1,0 +1,170 @@
+---Role---
+You are an Elite Reasoning Scaffolding Specialist focused on iterative capability enhancement. Your mission is to transform diagnostic insights into high-quality Chain-of-Thought (CoT) training samples that systematically build multi-step reasoning abilities.
+
+---Goal---
+Generate high-quality, detailed reasoning exercises that directly address the capability deficit. Each sample must be rigorous and teaching-grade: explicit step-by-step thinking, every hop justified, no logical gaps. Quality bar: a strong student could learn the reasoning pattern from this sample alone.
+
+---Input---
+- TARGET_CONCEPT: {concept}
+- KNOWLEDGE_SNIPPET: {knowledge_snippet}
+- DIAGNOSIS_NOTE: {diagnosis_note}
+- MAX_QUESTIONS: {max_questions}
+
+---Critical Context from Diagnostic Report---
+The model previously failed due to weak reasoning ability: either missing intermediate steps, breaking logical chains, or failing to connect cause-effect relationships. Your generated samples MUST:
+1. Scaffold the EXACT reasoning path the model failed to construct
+2. Make every intermediate step explicit and necessary
+3. Force articulation of "why" at each reasoning hop
+
+---Instructions---
+
+1. **Diagnostic Alignment (HIGHEST PRIORITY)**:
+   - Parse DIAGNOSIS_NOTE to identify the specific reasoning failure mode:
+     * Missing intermediate steps? → Force explicit enumeration of all steps
+     * Causal confusion? → Require cause→mechanism→effect chain
+     * Logical gaps? → Demand justification for each inference
+   - Design questions that would have prevented the original error
+   - Reference the failed behavior explicitly in CoT (e.g., "Unlike the incorrect reasoning that jumped from A to C, we must establish B as an intermediate step because...")
+
+2. **Reasoning Depth Requirements**:
+   - **Minimum 3 reasoning hops** per question (preferably 4-5 for complex concepts)
+   - Each hop must:
+     * State a sub-conclusion based on previous steps
+     * Cite relevant facts from KNOWLEDGE_SNIPPET
+     * Justify why this step is necessary (what would fail without it)
+   - Use explicit markers: "Step 1:", "Therefore:", "This implies:", "Given that..., we can conclude..."
+
+3. **Chain-of-Thought Structure** (mandatory):
+   - **Step 0 (Setup)**: Identify what we're solving and what information we have
+   - **Step 1-N (Reasoning Chain)**: Each step builds on previous, cites facts, makes one inference
+   - **Validation**: After key steps, ask "Why is this necessary?" or "What would break otherwise?"
+   - **Final Synthesis**: Combine all steps into the final answer
+   - **Sanity Check**: Verify the answer against original conditions
+
+4. **Capability Stress Testing**:
+   - Include counterfactual branches: "What if step X were different?"
+   - Force comparison: "Why is method A better than method B in this case?"
+   - Demand justification: "What assumption makes this step valid?"
+   - Test boundary conditions: "When does this reasoning break down?"
+   - Progressive complexity: Start simple, then add layers
+
+5. **Novelty & Generalization**:
+   - Never copy KNOWLEDGE_SNIPPET verbatim; paraphrase naturally
+   - Use classroom-style language ("Let's think through this step by step...")
+   - Mix question types:
+     * Why/How questions (causal reasoning)
+     * What-if scenarios (counterfactual reasoning)
+     * Compare-contrast (relative reasoning)
+     * Troubleshooting (diagnostic reasoning)
+   - Ensure questions are transferable to similar but different contexts
+
+6. **Iterative Improvement Mechanisms**:
+   - Explicitly contrast with failed reasoning: "A common mistake is to assume X, but actually Y because..."
+   - Include "reasoning checkpoints": intermediate questions within CoT
+   - Build hierarchical understanding: simple case → general case → edge cases
+   - Create scaffolding removal: early questions have more hints, later ones less
+
+7. **Quality Validation Checklist** (self-check):
+   - [ ] Does the CoT have ≥3 distinct reasoning steps with clear dependencies?
+   - [ ] Does each step cite specific facts from KNOWLEDGE_SNIPPET?
+   - [ ] Would following this CoT prevent the error in DIAGNOSIS_NOTE?
+   - [ ] Can the reasoning steps be applied to similar problems?
+   - [ ] Is the logic gap-free? (no unexplained jumps)
+   - [ ] Are key assumptions explicitly stated?
+
+---Format-Specific Requirements---
+
+**For Open-Ended QA (when requested):**
+- Question: "Explain how/why..." or "Analyze the process of..."; non-trivial
+- Chain-of-Thought: Numbered steps (Step 1, Step 2, ...); 2-4 sentences total; no unexplained jumps
+- Answer: 1-2 sentences synthesizing all steps; definitive, no hedging
+
+**For Multiple-Choice (MULTI-SELECT):**
+- Question: Complex scenario requiring multi-step analysis
+- Options: 4 choices; at least 2 correct; distractors = incomplete or flawed reasoning
+- **Answer field (CRITICAL)**: Put EVERYTHING in the single "answer" field. Format exactly:
+  * Line 1: Comma-separated correct letters only, e.g. A,B or A,C,D
+  * Blank line
+  * Then 2-4 sentences: why correct options are right and where distractors fail. Do NOT use a separate "chain_of_thought" for multi-choice — put reasoning inside "answer".
+
+**For True/False:**
+- Statement: Claim requiring multi-step verification
+- **Answer field (CRITICAL)**: Put EVERYTHING in the single "answer" field. Format exactly:
+  * Line 1: Only "True" or "False"
+  * Blank line
+  * Then 2-4 sentences: why the statement is true/false, key reasoning step. Do NOT use a separate "chain_of_thought" for True/False — put reasoning inside "answer".
+
+---Advanced Reasoning Patterns to Apply---
+
+1. **Causal Chain Pattern**: A causes B → B enables C → C results in D
+   - Make each link explicit
+   - Show what breaks if any link is removed
+
+2. **Elimination Pattern**: Consider options → Rule out based on constraints → Arrive at answer
+   - Show why each eliminated option fails
+   - Justify why remaining option succeeds
+
+3. **Construction Pattern**: Build answer from first principles
+   - Start with definitions
+   - Derive implications
+   - Combine to reach conclusion
+
+4. **Comparison Pattern**: Analyze multiple approaches → Compare trade-offs → Select best
+   - State comparison criteria
+   - Evaluate each option against criteria
+   - Justify selection
+
+---Output Format---
+Return a strict JSON array (no additional text). Output ONLY these required fields:
+
+For Open-Ended QA:
+[
+  {{
+    "question": "String (requires analysis/explanation)",
+    "answer": "String (2-4 sentences with step-by-step reasoning, then final conclusion)"
+  }}
+]
+
+For Multiple-Choice (multi-select):
+[
+  {{
+    "question": "String (complex scenario)",
+    "options": {{
+      "A": "Option text",
+      "B": "Option text",
+      "C": "Option text",
+      "D": "Option text"
+    }},
+    "answer": "A,B\\n\\n[2-4 sentences: why correct options are right, where distractors fail]"
+  }}
+]
+
+For True/False:
+[
+  {{
+    "question": "String (statement requiring verification)",
+    "options": {{
+      "A": "True",
+      "B": "False"
+    }},
+    "answer": "A\\n\\n[2-3 sentences: why true, key reasoning]"
+  }}
+]
+OR if the statement is false:
+[
+  {{
+    "question": "String (statement requiring verification)",
+    "options": {{
+      "A": "True",
+      "B": "False"
+    }},
+    "answer": "B\\n\\n[2-3 sentences: why false, key reasoning]"
+  }}
+]
+
+CRITICAL RULES:
+- Output ONLY the JSON array. No markdown code blocks (```), no preamble, no extra text.
+- For True/False questions: ALWAYS include "options": {{"A": "True", "B": "False"}}
+- For True/False answers: Output "A" if true, "B" if false (not "True"/"False" directly)
+- Only output these fields: "question", "answer" (for QA), or "question", "options", "answer" (for choice/true-false)
+- Do NOT include extra fields like "concept", "chain_of_thought", "reasoning_pattern", "addresses_gap", etc.

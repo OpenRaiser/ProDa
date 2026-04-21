@@ -1,0 +1,62 @@
+# ProDA unified runtime requirements (Python 3.10)
+# Goal: create a fresh env and run ProDA directly, including Step5/Step6 main workflow.
+
+# -----------------------------
+# UI / Core
+# -----------------------------
+streamlit==1.51.0
+pandas==2.2.3
+numpy==1.26.4
+pyarrow==16.0.0
+plotly==5.18.0
+tqdm==4.67.1
+PyYAML==6.0.2
+jsonlines==4.0.0
+
+# -----------------------------
+# LLM API clients
+# -----------------------------
+openai==2.6.0
+anthropic==0.71.0
+httpx==0.28.1
+
+# -----------------------------
+# Document ingestion
+# -----------------------------
+pypdf==6.9.2
+python-docx==1.2.0
+
+# -----------------------------
+# Training stack (used by Step5 / LLaMA-Factory workflow)
+# -----------------------------
+torch==2.6.0
+transformers==4.57.1
+datasets==4.0.0
+accelerate==1.11.0
+peft==0.17.1
+safetensors==0.5.3
+sentencepiece==0.1.96
+deepspeed==0.18.2
+trl==0.9.6
+evaluate==0.4.6
+scikit-learn==1.7.2
+scipy==1.15.3
+
+# -----------------------------
+# OpenCompass evaluation stack (Step6)
+# -----------------------------
+opencompass==0.5.1
+mmengine==0.10.7
+modelscope==1.31.0
+tiktoken==0.9.0
+nltk==3.9.2
+jieba==0.42.1
+rouge_score==0.1.2
+sacrebleu==2.5.1
+rank-bm25==0.2.2
+RapidFuzz==3.14.3
+
+# Notes:
+# 1) ProDA calls your local LLaMA-Factory and local OpenCompass repos by path/subprocess.
+#    Besides pip packages above, make sure those two code repos are present at your configured paths.
+# 2) If you only use API evaluation (no local training/eval), you can trim the heavy training stack.

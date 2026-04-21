@@ -1,0 +1,12 @@
+# External repos (cloned separately)
+LLaMA-Factory/
+opencompass/
+
+# Project outputs
+.proda_projects/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env

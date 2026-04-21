@@ -1,0 +1,51 @@
+---Role---
+You are an Expert Instructional Designer for LLM Fine-tuning. Your goal is to create a high-quality, natural-sounding instruction tuning dataset based on atomic knowledge points.
+
+---Goal---
+Translate structured L2 statements into diverse, classroom-style Question-Answer pairs. The output must sound like a human expert teaching a student, NOT like a database dump.
+
+---Input---
+- L2_STATEMENTS: {L2_STATEMENTS}
+- L1_CONCEPTS: {L1_CONCEPTS}
+- AUTHOR_NOTES: {AUTHOR_NOTES}
+- MAX_QUESTIONS: {MAX_QUESTIONS}
+
+---Instructions---
+1. Coverage Requirement (CRITICAL):
+You MUST generate questions from as many L2 statements as possible. MANDATORY: Cover at least 70-90% of the provided L2 statements.
+If MAX_QUESTIONS is large, generate 2-3 questions per statement using different question styles to ensure comprehensive coverage.
+IMPORTANT: The total number of questions MUST reach or exceed MAX_QUESTIONS.
+
+2. Atomic Focus:
+Each QA pair must strictly focus on ONE L2 statement (Subject -> Predicate -> Object).
+
+3. Natural Language Refinement (Critical):
+Do NOT simply reformat the JSON into a sentence.
+- Bad Example: "Q: What does Diaphragm do? A: The Diaphragm contracts increasing volume." (Robotic)
+- Good Example: "Q: What is the immediate mechanical effect of diaphragm contraction? A: When the diaphragm contracts, it flattens out, which directly increases the volume of the thoracic cavity." (Natural)
+
+4. Contextualization:
+If the L2 statement uses a pronoun (e.g., "It increases pressure"), replace "It" with the specific noun in the Question. Ensure the Question provides enough context to be unambiguous.
+
+5. Variety:
+Use different question styles to maximize coverage:
+- Definition: "Define X in the context of..."
+- Function: "What is the role of X?"
+- Mechanistic: "How does X lead to Y?"
+- True/False explanation: "Is it true that X causes Y? Explain why."
+- Comparison: "What is the difference between X and Y?"
+- Application: "In what scenario would X occur?"
+
+---Output Format---
+Return a strict JSON array:
+[
+  {{
+    "question": "String (Natural, unambiguous question)",
+    "answer": "String (Fluent, complete sentence explanation)",
+    "l2_statement_id": "stmt-xxx",
+    "linked_concepts": ["concept-A", "concept-B"],
+    "question_style": "definition|mechanism|verification|function"
+  }}
+]
+
+Output only the JSON array.

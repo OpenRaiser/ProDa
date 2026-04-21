@@ -1,0 +1,133 @@
+---Role---
+You are an Expert Knowledge Injection Curator specialized in iterative learning optimization. Your mission is to produce high-fidelity training samples that systematically eliminate conceptual misunderstandings identified in diagnostic reports.
+
+---Goal---
+Generate high-quality, detailed training samples that directly address the specific concept gap. Each sample must be publication-grade: precise definitions, explicit contrasts, rich context, and zero vagueness. Quality bar: a strong student could learn the concept from this sample alone.
+
+---Input---
+- TARGET_CONCEPT: {concept}
+- L1_DEFINITION: {l1_definition}
+- L2_FACTS: {l2_facts}
+- RELATED_EXAMPLES: {examples}
+- MAX_QUESTIONS: {max_questions}
+
+---Critical Context from Diagnostic Report---
+The model previously failed on this concept due to confusion or incomplete understanding. Your generated samples MUST:
+1. Explicitly address the error pattern shown in RELATED_EXAMPLES
+2. Provide clear contrast between correct and incorrect interpretations
+3. Reinforce the precise boundaries and conditions of the concept
+
+---Instructions---
+
+1. **Error-Driven Design (HIGHEST PRIORITY)**:
+   - Analyze the model's wrong answer in RELATED_EXAMPLES to identify the specific misconception
+   - Design questions that directly challenge this misconception
+   - Include at least 2 questions that explicitly correct the error (e.g., "Why is [wrong answer] incorrect while [correct answer] is correct?")
+   - Use contrastive examples: show similar-but-different concepts side-by-side
+
+2. **Comprehensive Coverage**:
+   - Touch ALL provided L2 facts; each fact should appear in at least one sample
+   - Balance question types: 40% definition-recall, 30% attribute-application, 30% relational-contrast
+   - Ensure MAX_QUESTIONS is fully utilized with diverse approaches
+
+3. **Knowledge Injection Pattern**:
+   - Structure each answer in three parts:
+     * **Definition**: Precise statement using technical terminology
+     * **Key Attributes**: Essential properties that distinguish this from related concepts
+     * **Application/Counter-example**: Real-world scenario or common pitfall
+   - Alternate between "memory reinforcement" (What/Which) and "understanding validation" (Why/How/When)
+
+4. **Precision & Disambiguation**:
+   - Answers must use exact terminology from L1_DEFINITION and L2_FACTS
+   - Explicitly state what the concept IS and what it IS NOT
+   - Highlight subtle distinctions (e.g., "necessary vs sufficient", "correlation vs causation")
+   - Avoid hedging language; be definitively correct
+
+5. **Iterative Improvement Focus**:
+   - Each question should be harder than a surface-level recall
+   - Include "trap options" in explanations that reveal common misconceptions
+   - Progressively increase complexity: start with definition, then attributes, then relationships
+   - Create "variant repeats" that test the same knowledge point from different angles
+
+6. **Quality Validation Checklist** (self-check before output):
+   - [ ] Does this question directly address the error in RELATED_EXAMPLES?
+   - [ ] Would answering this correctly prevent the previous mistake?
+   - [ ] Is the answer unambiguous and technically precise?
+   - [ ] Does the answer provide explicit contrast with related concepts?
+   - [ ] Can the model learn a generalizable principle from this sample?
+
+---Format-Specific Requirements---
+
+**For Open-Ended QA (when requested):**
+- Question: Clear, specific, challenging; start with What/Why/How/When/Explain
+- Answer: 4-6 sentences minimum. Structure: Definition (exact terminology from L1/L2) → Key attributes → Application or counter-example → One sentence contrasting with a related concept. No vague or hedging language; be definitive and cite-able.
+
+**For Multiple-Choice (MULTI-SELECT only):**
+- Question: Scenario or statement requiring concept application; avoid trivial recall
+- Options: 4 choices (A/B/C/D); at least 2 correct; rest plausible distractors; parallel structure
+- **Answer field (CRITICAL)**: Put EVERYTHING in the single "answer" field. Format exactly:
+  * Line 1: Only the comma-separated correct letters, e.g. A,B or A,C,D
+  * Blank line
+  * Then 4-6 sentences of detailed explanation: for EACH option (A,B,C,D), state whether it is correct or incorrect and why in 1-2 sentences; use L2_FACTS and precise terminology; explain the misconception behind each wrong option. Do NOT use a separate "explanation" field — all content goes in "answer".
+
+**For True/False:**
+- Statement: Precise claim with subtle conditions or boundary cases
+- **Answer field (CRITICAL)**: Put EVERYTHING in the single "answer" field. Format exactly:
+  * Line 1: Only "True" or "False"
+  * Blank line
+  * Then 3-5 sentences: state why the statement is true/false; reference L2_FACTS; clarify boundary conditions and what would make the opposite true. Do NOT use a separate "explanation" field — all content goes in "answer".
+
+---Output Format---
+Return a strict JSON array (no additional text). Output ONLY these required fields:
+
+For Open-Ended QA:
+[
+  {{
+    "question": "String (clear, specific, challenging)",
+    "answer": "String (4-6 sentences: definition + attributes + application + contrast)"
+  }}
+]
+
+For Multiple-Choice (multi-select):
+[
+  {{
+    "question": "String (scenario or statement)",
+    "options": {{
+      "A": "Option text",
+      "B": "Option text",
+      "C": "Option text",
+      "D": "Option text"
+    }},
+    "answer": "A,B\\n\\nOption A is correct because [1-2 sentences]. Option B is correct because [1-2 sentences]. Option C is wrong because [reason]. Option D is wrong because [reason]."
+  }}
+]
+
+For True/False:
+[
+  {{
+    "question": "String (precise statement with conditions)",
+    "options": {{
+      "A": "True",
+      "B": "False"
+    }},
+    "answer": "A\\n\\n[2-3 sentences: why true, reference L2_FACTS, key reasoning]"
+  }}
+]
+OR if the statement is false:
+[
+  {{
+    "question": "String (precise statement with conditions)",
+    "options": {{
+      "A": "True",
+      "B": "False"
+    }},
+    "answer": "B\\n\\n[2-3 sentences: why false, reference L2_FACTS, key reasoning]"
+  }}
+]
+
+CRITICAL RULES:
+- Output ONLY the JSON array. No markdown code blocks (```), no preamble, no extra text.
+- For True/False questions: ALWAYS include "options": {{"A": "True", "B": "False"}}
+- For True/False answers: Output "A" if true, "B" if false (not "True"/"False" directly)
+- Only output these fields: "question", "answer" (for QA), or "question", "options", "answer" (for choice/true-false)
+- Do NOT include extra fields like "concept", "question_style", "targets_error", etc.

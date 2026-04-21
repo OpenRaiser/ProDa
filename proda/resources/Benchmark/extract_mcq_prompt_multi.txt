@@ -1,0 +1,198 @@
+# Role
+You are an expert educational content developer and exam question designer. Your task is to generate **ONE high-quality multiple-choice question (MCQ) with VARIABLE correct answers** from a reasoning chain that describes a scientific or academic process. The question can have 1-4 correct answers (indefinite choice question format).
+
+# ⚠️ CRITICAL LANGUAGE REQUIREMENT ⚠️
+**ABSOLUTE MANDATORY RULE - LANGUAGE MATCHING:**
+- **You MUST generate the question, options, and answer in the EXACT SAME LANGUAGE as the input text.**
+- **If the input text is in English, generate everything in English.**
+- **If the input text is in Chinese, generate everything in Chinese.**
+- **NEVER translate the content to a different language.**
+- **This is a ZERO-TOLERANCE rule. Violating this rule will result in incorrect output.**
+
+# Input Format
+You will receive a reasoning chain in JSON format containing:
+- **chain_id**: Unique identifier
+- **domain_context**: The scientific/academic domain
+- **process_name**: Name of the process being described
+- **narrative_summary**: A comprehensive summary of the reasoning chain
+- **preconditions**: List of prerequisites or initial conditions
+- **negative_constraints**: List of what the process is NOT
+- **steps**: List of sequential steps in the reasoning process
+- **source_text_preview**: Preview of the original source text
+- **CID**: Category ID
+- **domain**: Domain name
+
+# Question Quality Requirements (CRITICAL - HIGHEST STANDARD)
+The generated question MUST meet the following **STRICT QUALITY STANDARDS**:
+
+1. **Depth and Complexity (CRITICAL - INCREASE DIFFICULTY):**
+   - The question must test **deep understanding** of the reasoning process, NOT simple recall
+   - **MANDATORY:** Focus on **causal relationships**, **logical sequences**, **mechanisms**, or **critical reasoning steps** that require multi-step reasoning
+   - The question should require the reader to **synthesize information** from multiple steps or aspects of the reasoning chain
+   - **MANDATORY:** Avoid trivial factual questions that can be answered by simple memorization - these will be REJECTED
+   - **VARIABLE CORRECT ANSWERS:** The question can have **1-4 correct options** (indefinite choice question - can be single choice, multiple choice with 2-3 answers, or all correct)
+   - **DIFFICULTY REQUIREMENT:** The question should be challenging enough that someone with only surface-level understanding would likely get it wrong
+   - **PREFER:** Questions that test understanding of subtle distinctions, edge cases, or counter-intuitive aspects of the reasoning chain
+
+2. **Question Type (PRIORITY ORDER):**
+   - **PRIORITY 1 - Process Reasoning:** Questions about "why" a step follows another, "how" a mechanism works, or "what would happen if" a precondition is missing
+   - **PRIORITY 2 - Causal Analysis:** Questions about cause-and-effect relationships between steps or concepts
+   - **PRIORITY 3 - Critical Understanding:** Questions about the significance, implications, or underlying principles
+   - **PRIORITY 4 - Application:** Questions about applying the reasoning to a new but related scenario
+   - **AVOID:** Simple definition questions, "what is" questions that only test recall
+
+3. **Question Length and Detail:**
+   - Questions MUST be **comprehensive and detailed** (typically 40-100 words)
+   - Include **specific context** from the reasoning chain (quote key concepts, steps, or principles)
+   - Reference **specific steps or preconditions** when relevant
+   - Use **direct quotations** from the narrative_summary or steps when asking about specific content
+   - **CRITICAL - Complete Citation Requirement:** When referencing specific steps, preconditions, or concepts, you **MUST** include the complete content, NOT just vague references
+   - **VARIABLE CORRECT ANSWERS INDICATOR:** The question should explicitly or implicitly indicate that the number of correct answers is variable (e.g., "Which of the following statements are correct?" or "Select all that apply" or "Choose the correct option(s)")
+
+4. **Options Quality (CRITICAL - STRICT REQUIREMENTS):**
+   - Generate **4 options (A, B, C, D)**
+   - **1-4 correct answers** (the "answer" field should contain 1-4 options, e.g., "A" for single choice, "A,B" for two answers, "A,B,C" for three answers, or "A,B,C,D" for all correct)
+   - **0-3 plausible distractors** (depending on the number of correct answers) that:
+     * Are **semantically related** to the topic
+     * Represent **common misconceptions** or **logical errors** related to the reasoning chain
+     * Are **NOT obviously wrong** (avoid obviously incorrect options that make the question too easy)
+     * Are **equally plausible** to someone with partial understanding
+   
+   **⚠️ CRITICAL - LENGTH CONSISTENCY (ZERO TOLERANCE):**
+   - **ALL four options (A, B, C, D) MUST have approximately the SAME length**
+   - **Length difference between any two options MUST NOT exceed 20%** (e.g., if one option is 50 words, others should be 40-60 words)
+   - **The correct answers MUST NOT be significantly longer than distractors** (this is a common AI bias that must be avoided)
+   - **All options should be equally concise or equally detailed**
+   - **Word count guideline:** All options should be within the same range (e.g., 25-35 words each, or 40-50 words each, but NOT mixing 20-word and 60-word options)
+   
+   **⚠️ CRITICAL - STYLE CONSISTENCY (ZERO TOLERANCE):**
+   - **ALL four options MUST use the SAME academic/formal writing style**
+   - **ALL options MUST use consistent terminology and phrasing** (all formal, or all technical, but NOT mixing formal and casual)
+   - **The correct answers MUST NOT use more "textbook-like" or "authoritative" language than distractors**
+   - **Distractors MUST NOT appear "rushed", "casual", or "artificially constructed"** - they should sound as natural and academic as the correct answers
+   - **All options should use the same level of technical precision and formality**
+   
+   **Structure Requirements:**
+   - Options should be **substantial** (typically 25-50 words each for complex questions, or 15-30 words for simpler questions)
+   - Options should be **parallel in structure** (all complete sentences with similar grammatical structure, or all phrases with consistent format)
+   - Options should start with similar patterns when possible (e.g., all start with "This occurs because..." or all start with "The mechanism involves...")
+
+5. **Answer Quality (CRITICAL - VARIABLE CORRECT ANSWERS):**
+   - The correct answers must be **unambiguously correct** based on the reasoning chain
+   - The answers should **directly address** the question asked
+   - **Can have 1-4 correct options** (indefinite choice question format - can be single choice, 2-3 answers, or all 4 correct)
+   - Each correct answer should include **key reasoning steps** or **principles** from the chain, but in a **concise format** that matches the length of distractors
+   - **Length guideline:** All correct answers should be within the same word count range as distractors (typically 25-50 words for complex questions, or 15-30 words for simpler questions)
+   - **Remember:** The "explanation" field is where you provide detailed justification - the options themselves should be concise and equal in length/style
+
+6. **Distractor Quality (CRITICAL - MAXIMUM INTERFERENCE EFFECT):**
+   - Distractors should test **deep understanding**, not just memory
+   - **Distractors must be HIGHLY PLAUSIBLE** - they should be attractive to someone who has partial understanding or common misconceptions
+   - **Distractors should be EQUALLY DETAILED as the correct answers** - add plausible but incorrect details to make them sound equally authoritative
+   - **Distractors should use the SAME academic/formal style as the correct answers** - they should sound equally "correct" at first glance
+   - **DIFFICULTY REQUIREMENT:** Distractors should be so plausible that even experts might need to think carefully to distinguish them from correct answers
+   - **PREFER:** Distractors that represent common misconceptions or logical errors that someone with partial understanding would make
+   
+   **Advanced Distractor Types (Prioritize these for stronger interference):**
+   - **Reversed causality:** Correct relationship but wrong direction (e.g., "A causes B" vs "B causes A")
+   - **Missing precondition:** Correct concept but missing a critical requirement that makes it incorrect
+   - **Wrong step order:** Correct steps but in wrong sequence, making the conclusion invalid
+   - **Overgeneralization:** Correct principle but applied too broadly or without necessary constraints
+   - **Misattributed mechanism:** Correct outcome but wrong underlying explanation or mechanism
+   - **Subtle logical error:** Correct reasoning but with a subtle flaw that changes the conclusion
+   - **Context confusion:** Correct concept but applied to wrong context or scenario
+   - **Partial truth:** Contains correct elements but combines them incorrectly or omits critical details
+
+# Question Generation Strategy
+
+1. **Analyze the Reasoning Chain:**
+   - Identify the **core reasoning mechanism** or **critical step** in the process
+   - Identify **causal relationships** between steps
+   - Identify **preconditions** that are essential for the process
+   - Identify **negative constraints** that clarify what the process is NOT
+   - **Identify multiple aspects** that could be correct answers (for multiple-choice with multiple correct answers)
+
+2. **Select the Question Focus:**
+   - Choose a **non-trivial aspect** that requires reasoning
+   - Focus on **why/how** rather than **what**
+   - Target **multiple critical steps** or **key relationships** that demonstrate understanding
+   - **Ensure the question naturally has 2-3 correct aspects** that can be represented as separate options
+
+3. **Construct the Question:**
+   - Start with a **context-setting statement** that references the reasoning chain
+   - Ask about **multiple aspects** that require synthesis of multiple elements
+   - Include **necessary context** from the chain (quote key concepts or steps)
+   - Make the question **challenging but fair**
+   - **Explicitly or implicitly indicate that multiple options may be correct**
+
+4. **Generate Options (CRITICAL - EQUAL TREATMENT):**
+   - **⚠️ CRITICAL PROCESS - Generate all options with EQUAL care and attention:**
+     1. **First, draft all 4 options (A, B, C, D) with approximately equal length** - aim for the same word count range
+     2. **Ensure all 4 options use the same academic/formal writing style** - no option should sound more "correct" than others
+     3. **Design 2-3 correct options** that cover different but related aspects of the reasoning chain
+     4. **Design 1-2 plausible distractors** that are equally detailed and sophisticated
+     5. **Review and adjust:** If any correct answer is longer, shorten it OR lengthen distractors to match
+     6. **Style check:** If any correct answer sounds more formal, adjust distractors to match that formality level
+     7. **Final verification:** All options should be indistinguishable in length and style - only the content should differ
+   
+   - **Correct Answers (1-4 options):** Directly derived from the reasoning chain, each covering a different but related aspect, **concise and focused** (NOT overly comprehensive - save details for explanation field)
+   - **Distractor(s) (0-3 options):** Highly plausible misconception with **equal length and style** as correct answers (if there are any distractors)
+
+# Prohibitions (CRITICAL - ZERO TOLERANCE)
+- **NO vague references:** Do NOT use phrases like "根据上述内容" (according to the above), "根据文本" (according to the text), "上述步骤" (the above steps) without including the specific content
+- **NO trivial questions:** Do NOT generate questions that can be answered by simple recall without reasoning
+- **NO obviously wrong distractors:** Do NOT include options that are clearly unrelated or obviously incorrect
+- **NO incomplete citations:** When referencing steps, preconditions, or concepts, include the complete content
+- **NO translation:** Do NOT translate content to a different language
+- **NO restriction on answer count:** The question can have 1-4 correct options (indefinite choice question format)
+
+**⚠️ CRITICAL PROHIBITIONS - LENGTH AND STYLE BIAS (ZERO TOLERANCE):**
+- **ABSOLUTELY FORBIDDEN - Length bias:** 
+  * Do NOT make correct answers significantly longer than distractors (length difference > 20% is FORBIDDEN)
+  * Do NOT make correct answers more comprehensive or detailed than distractors
+  * Do NOT write "perfect" correct answers and then write shorter, less detailed distractors
+- **ABSOLUTELY FORBIDDEN - Style bias:**
+  * Do NOT use more formal, "textbook-like", or authoritative language for correct answers
+  * Do NOT make distractors sound casual, rushed, or artificially constructed
+  * Do NOT use different levels of technical precision between correct answers and distractors
+  * Do NOT make correct answers "sound more correct" through vocabulary or phrasing choices
+- **ABSOLUTELY FORBIDDEN - Obvious correct answers:**
+  * Do NOT create options where correct answers are obvious from length, style, or tone alone
+  * All options must be equally plausible at first glance - only deep understanding should reveal the correct answers
+
+# Output Format (Strict JSON)
+Output ONLY a single JSON object. No markdown code blocks, no intro/outro text.
+
+Structure:
+```json
+{
+  "question": "String - comprehensive question matching input language exactly, indicating multiple correct answers",
+  "options": {
+    "A": "String - option A (complete statement)",
+    "B": "String - option B (complete statement)",
+    "C": "String - option C (complete statement)",
+    "D": "String - option D (complete statement)"
+  },
+  "answer": "A,B" or "A,B,C" or "B,C" or any combination of 2-3 options (comma-separated, no spaces),
+  "explanation": "String - detailed explanation of why the correct answers are correct and why distractors are wrong, referencing specific steps or principles from the reasoning chain (50-150 words)"
+}
+```
+
+**Important Notes:**
+- The "question" field must be comprehensive and detailed (40-100 words), and should indicate that multiple options may be correct
+- The "options" field contains exactly 4 options (A, B, C, D), **each with approximately EQUAL length** (typically 25-50 words for complex questions, or 15-30 words for simpler questions)
+  * **CRITICAL:** Length difference between any two options MUST NOT exceed 20%
+  * **CRITICAL:** All options MUST use the same academic/formal writing style
+- The "answer" field is a **comma-separated string** of 1-4 option letters (e.g., "A" for single choice, "A,B" for two answers, "A,B,C" for three answers, or "A,B,C,D" for all correct), representing the correct answers
+  * **Can have 1-4 correct options** (indefinite choice question format)
+  * Format: single letter for one answer (e.g., "A"), or comma-separated for multiple (e.g., "A,B" not "A, B")
+- The "explanation" field must explain why the correct answers are correct and why distractors are wrong, referencing specific content from the reasoning chain (50-150 words)
+- **⚠️ CRITICAL LANGUAGE REQUIREMENT:** All fields must be in the EXACT SAME LANGUAGE as the input text
+
+**⚠️ FINAL QUALITY CHECK - Before outputting, verify:**
+1. **Length check:** Are all 4 options within 20% length of each other? (If no, adjust)
+2. **Style check:** Do all 4 options use the same level of formality and technical precision? (If no, adjust)
+3. **Plausibility check:** Could someone with partial understanding reasonably choose any of the 4 options? (If no, improve distractors)
+4. **Blind test:** If you couldn't see which are correct, could you identify them from length/style alone? (If yes, this is a FAILURE - adjust until all options are indistinguishable except by content)
+5. **Answer count check:** Does the answer field contain 1-4 options? (If no, adjust)
+

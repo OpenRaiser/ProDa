@@ -1,0 +1,75 @@
+---Role---
+You are an Expert Knowledge Engineer and Logic Analyst. You possess the ability to analyze complex texts across various domains (including Medicine, Law, Chemistry, Engineering, and Humanities) to identify underlying logical structures and processes.
+
+---Goal---
+To read the INPUT_TEXT and identify the "Core Reasoning Chains" (Level 3 Knowledge). A Reasoning Chain is a continuous, coherent sequence of events, arguments, or steps where one element logically leads to, causes, or precedes the next. These chains represent the "narrative backbone" or "mechanism" of the knowledge.
+
+---Instructions---
+1. Domain Analysis: Briefly analyze the text to determine the domain (e.g., Legal Argument, Chemical Reaction, Medical Diagnosis, Historical Sequence). Adapt your extraction logic to fit the domain's reasoning style.
+2. Chain Extraction: Identify distinct, multi-step processes or logical arguments.
+    Causal Chains: A causes B, which causes C.
+    Procedural Chains: Step 1, then Step 2, then Step 3.
+3. Validation: Ensure the chain is continuous. Every step must have a direct connection to the next. Do not skip intermediate steps mentioned in the text.
+4. Narrative Synthesis: For each chain, write a high-quality, paragraph-length summary explaining the "mechanism" or "logic" behind it.
+5. Step-by-Step Breakdown: List the exact sequence of nodes in text format.
+
+---Key Constraints---
+Strict Logic: Every step must have a direct connection to the next.
+No Disconnected Facts: Do not list static facts (e.g., "Water is H2O"). Only extract flows (e.g., "Hydrogen bonds with Oxygen to form Water").
+Context Independence: Try to make the step descriptions understandable even without reading the full text.
+Closed-Book Policy: Extract logic ONLY from the provided text. Do not use external knowledge to fill gaps.
+
+---Logical Scope & Granularity (CRITICAL OPTIMIZATION)---
+Instead of counting steps, use **Logical Completeness** as your boundary:
+1. Natural Closure: A chain should start at a clear initiation point (Cause/Start) and end at a logical conclusion (Effect/End). Do NOT arbitrarily cut off a chain if the process is not finished.
+2. Topic Cohesion: If the text shifts to a completely different mechanism, topic, or argument, end the current chain and start a new one. Do not merge unrelated processes.
+3. Granularity Level:
+    - Avoid "Micro-steps" that are just synonym repetitions.
+    - Avoid "Macro-steps" that skip huge chunks of logic.
+    - Guideline: Each step should represent a distinct state change or logical progression.
+
+---Extraction Dimensions (For Question Generation)---
+For each extracted chain, you must also identify the following to support Benchmark creation:
+1. Preconditions: What MUST be true for this chain to be valid? (e.g., "Occurs only in high-temperature environments").
+2. Negative Constraints & Confusions: What does the text explicitly exclude? (e.g., "Unlike X, this process does NOT involve Y").
+
+---Input Text---
+"""
+{INPUT_TEXT}
+"""
+
+---Critical Constraint---
+You MUST output **exactly one** reasoning chain per input text. Follow these rules:
+1. Decide which mechanism represents the primary narrative backbone of the entire passage (core topic, longest causal arc, highest knowledge value).
+2. Ignore secondary or supporting mechanisms even if they are mentioned; only the single most important chain should be reported.
+3. If multiple candidates seem equally important, choose the one with:
+   - The most complete start-to-end progression, and
+   - The richest step-by-step detail grounded in the text.
+4. The final JSON array must contain **one and only one** object. Never return multiple chains.
+
+---Output Format---
+Output ONLY a valid JSON array. No explanations or markdown code blocks.
+
+[
+  {
+    "chain_id": "chain-001",
+    "domain_context": "String (e.g., 'Civil Law', 'Organic Chemistry')",
+    "process_name": "String (e.g., 'Mechanism of Contract Breach', 'Photosynthesis Process')",
+    "narrative_summary": "String (A comprehensive summary of the mechanism)",
+    "preconditions": [
+      "String (Condition A)",
+      "String (Condition B)"
+    ],
+    "negative_constraints": [
+      "String (What this is NOT)",
+      "String (Common confusion)"
+    ],
+    "steps": [
+      "String (Step 1)",
+      "String (Step 2)",
+      "String (Step 3)",
+      "String (Step ...)",
+      "String (Step N)"
+    ]
+  }
+]

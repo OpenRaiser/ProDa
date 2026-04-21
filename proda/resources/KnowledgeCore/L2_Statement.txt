@@ -1,0 +1,77 @@
+---Role---
+You are a Structural Logic Decomposer. Your task is to break down complex, continuous reasoning chains into discrete, atomic factual statements (Level 2 Knowledge).
+
+---Goal---
+To translate the continuous flow of the "Reasoning Chains" into distinct "Atomic Links". These links will serve as high-quality training data, ensuring the model learns the precise relationships between adjacent steps in a process.
+
+---Inputs---
+L3_CHAINS_INPUT: The JSON output from Stage 1 containing reasoning chains.
+ORIGINAL_TEXT: For context verification and quote extraction.
+
+---Instructions---
+1. Process Chains: Iterate through each chain_id provided in the input.
+2. Sliding Window Decomposition: Look at the steps array. For every adjacent pair of steps (Step[i] and Step[i+1]), generate a Factual Statement.
+    Example Chain: A -> B -> C
+    Target Output: Statement(A -> B) AND Statement(B -> C).
+3. Formulate the Statement:
+    Subject: The concept/entity in Step[i].
+    Object: The concept/entity in Step[i+1].
+    Predicate: A specific verb phrase describing the relationship. (e.g., "causes", "is followed by", "implies", "reacts with", "legally binds").
+    Source Quote: Extract the exact short phrase from ORIGINAL_TEXT that proves this specific link.
+4. Contextualization (Crucial): If a step is a pronoun or vague (e.g., "It expands"), you MUST replace it with the specific noun (e.g., "The Lung expands") based on the previous steps. The Subject and Object must be understandable on their own.
+
+---Key Constraints---
+Atomicity: Each statement must describe ONE single logical step.
+Strict Adjacency: Do not create links between Step[i] and Step[i+2]. Only link immediate neighbors.
+Hallucination Prevention: If the relationship between Step[i] and Step[i+1] is not explicitly supported by the ORIGINAL_TEXT, mark it as invalid or skip it.
+
+---Balance Requirement (CRITICAL)---
+Process ALL Chains EQUALLY: You MUST process every chain_id in the input with equal attention.
+- Do NOT skip any chain, especially shorter ones.
+- Do NOT over-extract from longer chains while ignoring shorter ones.
+
+DISTRIBUTION CHECK: Before finalizing output, verify that:
+- Statements are distributed across ALL input chains.
+- No single chain contributes more than 20% of total statements (unless there are fewer than 5 chains).
+- If you notice one chain dominating, go back and extract MORE statements from other chains.
+
+WARNING: Output where 3 or fewer chains contribute more than 50% of all statements will be considered UNBALANCED and INVALID.
+
+---L3 Chains Input---
+"""
+{L3_CHAINS_INPUT}
+"""
+
+---Original Text---
+"""
+{ORIGINAL_TEXT}
+"""
+
+---Output Format---
+JSON Array:
+[
+  {{
+    "statement_id": "stmt-001",
+    "parent_chain_id": "chain-001",
+    "subject": "String (Standardized Concept A)",
+    "predicate": "String (Relationship Verb)",
+    "object": "String (Standardized Concept B)",
+    "source_quote": "String (Evidence from text)"
+  }}
+]
+
+---CRITICAL OUTPUT REQUIREMENTS---
+1. Output strictly valid JSON only. Do NOT include markdown code blocks (```json or ```).
+2. Do NOT include any explanations, comments, or additional text before or after the JSON.
+3. Start your response directly with the opening bracket '[' and end with the closing bracket ']'.
+4. Ensure all strings are properly escaped for JSON (e.g., use \" for quotes, \\ for backslashes).
+5. The output must be parseable by standard JSON parsers without any preprocessing.
+
+Example of CORRECT output:
+[{{"statement_id":"stmt-001","parent_chain_id":"chain-001","subject":"Concept A","predicate":"causes","object":"Concept B","source_quote":"evidence text"}}]
+
+Example of INCORRECT output (DO NOT DO THIS):
+```json
+[{{"statement_id":"stmt-001",...}}]
+```
+Explanation: This is a valid JSON array...

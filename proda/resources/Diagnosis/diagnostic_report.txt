@@ -1,0 +1,32 @@
+"""You are a strict model evaluation expert. Please analyze the following error sample and output a JSON-formatted diagnosis.
+
+## Question Information
+**Question**: {error_sample.get("question")}
+
+**Correct Answer**: {error_sample.get("true_answer")}
+
+**Model Answer**: {error_sample.get("predicted_answer")}
+
+**Question Type**: {error_sample.get("question_type")}
+
+**Subject**: {error_sample.get("subject")}
+
+**Chain ID**: {error_sample.get("metadata", {}).get("chain_id")}
+
+## Diagnosis Requirements
+Please analyze why the model answered incorrectly and categorize it into one of the following two issue types:
+
+1. **concept_gap** (Conceptual Gap): The model has unclear understanding, confusion, or missing knowledge about related concepts
+2. **capability_deficit** (Reasoning Deficit): The model has weak reasoning ability, fails in multi-step reasoning, or breaks logical chains
+
+## Output Format (JSON only)
+{{
+  "issue_type": "concept_gap or capability_deficit",
+  "key_concept": "Core concept involved in the error (brief)",
+  "reasoning": "1-2 sentences explaining why the answer is wrong",
+  "recommendation": "Brief repair suggestion",
+  "confidence": 0.9
+}}
+
+Please output JSON directly, without any other text.
+"""

@@ -1,0 +1,87 @@
+---Role---
+You are an Expert True/False Judgment Question Designer for LLM Fine-tuning. Your goal is to create precise judgment questions that test deep understanding of L1/L2 knowledge.
+
+---Goal---
+Generate true/false judgment questions from L2 factual statements. Each question requires the model to determine correctness and provide detailed reasoning.
+
+---Input---
+- L2_STATEMENTS: {L2_STATEMENTS}
+- L1_CONCEPTS: {L1_CONCEPTS}
+- AUTHOR_NOTES: {AUTHOR_NOTES}
+- MAX_QUESTIONS: {MAX_QUESTIONS}
+- TRUE_RATIO: {TRUE_RATIO}
+
+---Instructions---
+1. Distribution Requirement:
+Generate approximately {TRUE_RATIO}% true statements and the rest false statements.
+Total questions MUST reach or exceed MAX_QUESTIONS.
+
+2. True Statement Construction:
+- Directly convert L2 statement (Subject + Predicate + Object) into a declarative sentence
+- Example L2: "Diaphragm -> contracts -> increasing thoracic volume"
+- True statement: "The diaphragm contracts, which increases thoracic volume."
+- Keep the core logical relationship intact
+
+3. False Statement Construction (3 strategies):
+- Object Replacement: Swap the Object with an incorrect but plausible alternative from other L2 statements
+  Example: "The diaphragm contracts, which decreases blood pressure." (✗)
+- Predicate Reversal: Flip the relationship (e.g., "promotes" → "inhibits")
+  Example: "The diaphragm relaxation increases thoracic volume." (✗)
+- Subject Confusion: Replace Subject with a related but wrong concept from L1
+  Example: "The lungs contract to increase thoracic volume." (✗)
+
+4. Coverage Requirement:
+Cover at least 70% of the provided L2 statements. Generate diverse questions to test different aspects of knowledge.
+
+5. Natural Language:
+Write statements in fluent, natural language. Avoid awkward phrasing.
+
+6. Reasoning (CRITICAL):
+Every question MUST include detailed reasoning that:
+- For TRUE: explains why the relationship is correct based on domain knowledge
+- For FALSE: identifies the specific error and provides the correct information
+
+IMPORTANT - Reasoning Quality Rules:
+- Write reasoning in natural, educational language using domain knowledge
+- DO NOT reference internal identifiers like "stmt-XXX" or "concept-XXX" in reasoning
+- DO NOT mention "L2 statement", "L1 concept", or similar technical metadata terms
+- Focus on explaining WHY the statement is correct/incorrect using scientific reasoning
+- Example BAD: "This is true because L2 statement (stmt-010) states..."
+- Example GOOD: "This is true because contraction of the diaphragm flattens it, enlarging the thoracic cavity and creating negative pressure that draws air into the lungs."
+
+---Output Format---
+Return a strict JSON array **without markdown fences**:
+[
+  {{
+    "statement": "Clear declarative statement (natural language)",
+    "answer": "true",
+    "question_type": "true_false",
+    "reasoning": "Detailed explanation for why the statement is correct/incorrect",
+    "l2_statement_id": "stmt-001",
+    "linked_concepts": ["concept-A", "concept-B"]
+  }}
+]
+
+Note: Use lowercase "true" or "false" for the answer field (not "True"/"False" or Chinese characters).
+
+Example:
+[
+  {{
+    "statement": "The diaphragm contracts and flattens during inhalation, increasing thoracic volume.",
+    "answer": "true",
+    "question_type": "true_false",
+    "reasoning": "This is the primary mechanism of quiet inspiration: contraction lowers the diaphragm, enlarges the thoracic cavity, and draws air in.",
+    "l2_statement_id": "stmt-010",
+    "linked_concepts": ["diaphragm", "inspiration"]
+  }},
+  {{
+    "statement": "Alveolar surfactant raises surface tension so alveoli remain rigid during exhalation.",
+    "answer": "false",
+    "question_type": "true_false",
+    "reasoning": "Surfactant lowers surface tension; increasing it would cause collapse. Therefore the statement contradicts respiratory physiology.",
+    "l2_statement_id": "stmt-014",
+    "linked_concepts": ["surfactant"]
+  }}
+]
+
+Output only the JSON array—no prose outside it, no code fences.
