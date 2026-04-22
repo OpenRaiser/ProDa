@@ -1,8 +1,11 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type {
+  BenchmarkJob,
   EvalSession,
+  ExtractionJob,
   FineTuneSection,
+  KnowledgeCore,
   Language,
   LlmProfiles,
   PageId,
@@ -82,6 +85,18 @@ interface SessionState {
   preselectedTrainSessionId: string | null;
   setPreselectedEvalRunId: (v: string | null) => void;
   setPreselectedTrainSessionId: (v: string | null) => void;
+
+  // Phase 1 — extraction job (not persisted; survives tab switches within session)
+  extractionJob: ExtractionJob | null;
+  setExtractionJob: (j: ExtractionJob | null) => void;
+
+  // Phase 2 — benchmark job (not persisted; survives tab switches)
+  benchmarkJob: BenchmarkJob | null;
+  setBenchmarkJob: (j: BenchmarkJob | null) => void;
+
+  // Shared knowledge-core cache (not persisted; enables instant cross-tab KC awareness)
+  knowledgeCoreCache: KnowledgeCore | null;
+  setKnowledgeCoreCache: (c: KnowledgeCore | null) => void;
 
   // Global toast notifications
   toasts: Toast[];
@@ -298,6 +313,15 @@ export const useSession = create<SessionState>()(
       preselectedTrainSessionId: null,
       setPreselectedEvalRunId: (v) => set({ preselectedEvalRunId: v }),
       setPreselectedTrainSessionId: (v) => set({ preselectedTrainSessionId: v }),
+
+      extractionJob: null,
+      setExtractionJob: (j) => set({ extractionJob: j }),
+
+      benchmarkJob: null,
+      setBenchmarkJob: (j) => set({ benchmarkJob: j }),
+
+      knowledgeCoreCache: null,
+      setKnowledgeCoreCache: (c) => set({ knowledgeCoreCache: c }),
 
       toasts: [],
       pushToast: (t) => {

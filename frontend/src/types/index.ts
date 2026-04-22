@@ -97,6 +97,8 @@ export interface ExtractionJob {
   total: number;
   done: number;
   effective_mode: ProcessingMode;
+  /** The mode the user configured (e.g. "auto"); preserved across polling updates. */
+  configured_mode?: string;
   result: KnowledgeCore | null;
   error: string | null;
   created_at: string;
@@ -201,6 +203,7 @@ export interface StartBenchmarkBody {
   retries: number;
   max_refill_rounds?: number;
   adaptive_concurrency?: boolean;
+  resume?: boolean;
   llm: LlmCtx;
 }
 

@@ -1,7 +1,6 @@
 import clsx from "clsx";
 import {
   Files,
-  Workflow,
   Settings,
 } from "lucide-react";
 import { useSession } from "@/store/useSession";
@@ -9,7 +8,6 @@ import { useI18n } from "@/hooks/useI18n";
 
 const TOP_ITEMS = [
   { id: "explorer" as const, icon: Files, key: "activity.explorer" },
-  { id: "workflow" as const, icon: Workflow, key: "activity.workflow" },
 ];
 
 export function ActivityBar() {

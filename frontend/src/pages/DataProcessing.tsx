@@ -55,13 +55,15 @@ export function DataProcessing() {
   const profiles = useSession((s) => s.llmProfiles);
   const selectedModel = useSession((s) => s.selectedModel);
   const setConfigModalOpen = useSession((s) => s.setConfigModalOpen);
+  const job = useSession((s) => s.extractionJob);
+  const setJob = useSession((s) => s.setExtractionJob);
+  const setKnowledgeCoreCache = useSession((s) => s.setKnowledgeCoreCache);
 
   const [uploads, setUploads] = useState<UploadedFileMeta[]>([]);
   const [uploading, setUploading] = useState(false);
   const [availableJsonPaths, setAvailableJsonPaths] = useState<string[]>([]);
   const [jsonFields, setJsonFields] = useState<string[]>([]);
   const [cfg, setCfg] = useState<ExtractionCfg>(DEFAULT_CFG);
-  const [job, setJob] = useState<ExtractionJob | null>(null);
   const [starting, setStarting] = useState(false);
   const [launchError, setLaunchError] = useState("");
 
@@ -93,12 +95,14 @@ export function DataProcessing() {
     try {
       const c = await getKnowledgeCore(project.id);
       if (c) {
-        setCore({
+        const coreWithRid = {
           ...c,
           l1_concepts: withRid(c.l1_concepts) as unknown as L1Concept[],
           l2_statements: withRid(c.l2_statements) as unknown as L2Statement[],
           l3_chains: withRid(c.l3_chains) as unknown as L3Chain[],
-        });
+        };
+        setCore(coreWithRid);
+        setKnowledgeCoreCache(c);
       } else {
         setCore(null);
       }
@@ -106,14 +110,54 @@ export function DataProcessing() {
     } catch {
       // ignore
     }
-  }, [project]);
+  }, [project, setKnowledgeCoreCache]);
+
+  const startPolling = useCallback(
+    (jobId: string) => {
+      if (pollTimer.current) clearInterval(pollTimer.current);
+      pollTimer.current = setInterval(async () => {
+        try {
+          const j = await getJob(jobId);
+          // Preserve configured_mode (set at job start; backend doesn't return it)
+          const configuredMode = useSession.getState().extractionJob?.configured_mode;
+          setJob({ ...j, configured_mode: configuredMode });
+          if (j.status === "done" || j.status === "error" || j.status === "cancelled") {
+            if (pollTimer.current) {
+              clearInterval(pollTimer.current);
+              pollTimer.current = null;
+            }
+            if (j.status === "done" && j.result) {
+              setCore({
+                ...j.result,
+                l1_concepts: withRid(j.result.l1_concepts) as unknown as L1Concept[],
+                l2_statements: withRid(j.result.l2_statements) as unknown as L2Statement[],
+                l3_chains: withRid(j.result.l3_chains) as unknown as L3Chain[],
+              });
+              setKnowledgeCoreCache(j.result);
+              setDirty(false);
+              setLTab("l3");
+            }
+          }
+        } catch {
+          // ignore transient errors; keep polling
+        }
+      }, 900);
+    },
+    [setJob, setKnowledgeCoreCache]
+  );
 
   useEffect(() => {
     refreshUploads();
     refreshCore();
-  }, [refreshUploads, refreshCore]);
-
-  // When JSON file set changes, inspect paths
+    // Resume polling if an extraction job was running before this tab was last left
+    const existing = useSession.getState().extractionJob;
+    if (existing && (existing.status === "pending" || existing.status === "running")) {
+      startPolling(existing.id);
+    }
+    return () => {
+      if (pollTimer.current) clearInterval(pollTimer.current);
+    };
+  }, [refreshUploads, refreshCore, startPolling]);
   useEffect(() => {
     (async () => {
       if (!project || !firstJsonUpload) {
@@ -145,43 +189,6 @@ export function DataProcessing() {
     await deleteUpload(project.id, fileId);
     await refreshUploads();
   };
-
-  const startPolling = useCallback(
-    (jobId: string) => {
-      if (pollTimer.current) clearInterval(pollTimer.current);
-      pollTimer.current = setInterval(async () => {
-        try {
-          const j = await getJob(jobId);
-          setJob(j);
-          if (j.status === "done" || j.status === "error" || j.status === "cancelled") {
-            if (pollTimer.current) {
-              clearInterval(pollTimer.current);
-              pollTimer.current = null;
-            }
-            if (j.status === "done" && j.result) {
-              setCore({
-                ...j.result,
-                l1_concepts: withRid(j.result.l1_concepts) as unknown as L1Concept[],
-                l2_statements: withRid(j.result.l2_statements) as unknown as L2Statement[],
-                l3_chains: withRid(j.result.l3_chains) as unknown as L3Chain[],
-              });
-              setDirty(false);
-              setLTab("l3");
-            }
-          }
-        } catch {
-          // ignore transient errors; keep polling
-        }
-      }, 900);
-    },
-    []
-  );
-
-  useEffect(() => {
-    return () => {
-      if (pollTimer.current) clearInterval(pollTimer.current);
-    };
-  }, []);
 
   const handleStart = async () => {
     if (!project) return;
@@ -229,6 +236,7 @@ export function DataProcessing() {
         total: 0,
         done: 0,
         effective_mode: cfg.processing_mode,
+        configured_mode: cfg.processing_mode,
         result: null,
         error: null,
         created_at: new Date().toISOString(),
@@ -388,6 +396,15 @@ export function DataProcessing() {
                 error: t("dp.job_error"),
                 cancelled: t("dp.job_cancelled"),
               }}
+              extras={
+                job.configured_mode === "auto" &&
+                job.effective_mode &&
+                job.effective_mode !== "auto" ? (
+                  <span className="text-[11px] font-mono text-[var(--vs-fg-subtle)]">
+                    (auto→{job.effective_mode})
+                  </span>
+                ) : undefined
+              }
             />
           )}
         </section>

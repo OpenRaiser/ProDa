@@ -91,6 +91,10 @@ export function Benchmark() {
   const profiles = useSession((s) => s.llmProfiles);
   const selectedModel = useSession((s) => s.selectedModel);
   const setConfigModalOpen = useSession((s) => s.setConfigModalOpen);
+  const job = useSession((s) => s.benchmarkJob);
+  const setJob = useSession((s) => s.setBenchmarkJob);
+  const knowledgeCoreCache = useSession((s) => s.knowledgeCoreCache);
+  const setKnowledgeCoreCache = useSession((s) => s.setKnowledgeCoreCache);
 
   const [kc, setKc] = useState<KnowledgeCore | null>(null);
   const [rows, setRows] = useState<MCQItem[]>([]);
@@ -105,7 +109,6 @@ export function Benchmark() {
   const [temperature, setTemperature] = useState(0.3);
   const [retries, setRetries] = useState(2);
 
-  const [job, setJob] = useState<BenchmarkJob | null>(null);
   const [starting, setStarting] = useState(false);
   const [launchError, setLaunchError] = useState("");
 
@@ -119,6 +122,7 @@ export function Benchmark() {
         getBenchmark(project.id),
       ]);
       setKc(c ?? null);
+      if (c) setKnowledgeCoreCache(c);
       const list = bm ?? [];
       setRows(list);
       setFlatRows(withRid(list.map(toFlat)) as unknown as FlatMCQ[]);
@@ -126,22 +130,9 @@ export function Benchmark() {
     } catch {
       // ignore
     }
-  }, [project]);
+  }, [project, setKnowledgeCoreCache]);
 
-  useEffect(() => {
-    refreshAll();
-  }, [refreshAll]);
-
-  useEffect(() => {
-    return () => {
-      if (pollTimer.current) clearInterval(pollTimer.current);
-    };
-  }, []);
-
-  const l3Count = (kc?.l3_chains ?? []).length;
-  const targetTotal = Math.max(0, l3Count) * Math.max(1, qpc);
-
-  const startPolling = (jobId: string) => {
+  const startPolling = useCallback((jobId: string) => {
     if (pollTimer.current) clearInterval(pollTimer.current);
     pollTimer.current = setInterval(async () => {
       try {
@@ -164,9 +155,43 @@ export function Benchmark() {
         // ignore polling errors
       }
     }, 900);
-  };
+  }, [setJob]);
 
-  const handleStart = async () => {
+  useEffect(() => {
+    refreshAll();
+    // Resume polling if a benchmark job was in-progress before this tab was left
+    const existing = useSession.getState().benchmarkJob;
+    if (existing && (existing.status === "pending" || existing.status === "running")) {
+      startPolling(existing.id);
+    }
+    return () => {
+      if (pollTimer.current) clearInterval(pollTimer.current);
+    };
+  }, [refreshAll, startPolling]);
+
+  // Poll for KC until step 1 completes (handles case where user is on this tab while step 1 runs)
+  useEffect(() => {
+    const effectiveKc = kc ?? knowledgeCoreCache;
+    if (effectiveKc || !project) return;
+    const timer = setInterval(async () => {
+      try {
+        const c = await getKnowledgeCore(project.id);
+        if (c && (c.l3_chains ?? []).length > 0) {
+          setKc(c);
+          setKnowledgeCoreCache(c);
+        }
+      } catch {
+        // ignore
+      }
+    }, 2000);
+    return () => clearInterval(timer);
+  }, [kc, knowledgeCoreCache, project, setKnowledgeCoreCache]);
+
+  const effectiveKc = kc ?? knowledgeCoreCache;
+  const l3Count = (effectiveKc?.l3_chains ?? []).length;
+  const targetTotal = Math.max(0, l3Count) * Math.max(1, qpc);
+
+  const handleStart = async (resume = false) => {
     if (!project) return;
     setLaunchError("");
     if (l3Count === 0) {
@@ -190,6 +215,7 @@ export function Benchmark() {
         questions_per_chain: qpc,
         temperature,
         retries,
+        resume,
         llm: {
           provider: providerKey,
           model: modelId,
@@ -202,9 +228,9 @@ export function Benchmark() {
         project_id: project.id,
         status: "pending",
         progress: 0,
-        message: "Queued",
+        message: resume ? "Resuming..." : "Queued",
         total: targetTotal,
-        done: 0,
+        done: resume ? Math.min(rows.length, targetTotal) : 0,
         chains: l3Count,
         questions_per_chain: qpc,
         result: null,
@@ -380,9 +406,25 @@ export function Benchmark() {
         {l3Count > 0 && (
           <section className="space-y-3">
             <div className="flex items-center gap-3 flex-wrap">
+              {/* Resume button — shown when partial results exist */}
+              {rows.length > 0 && rows.length < targetTotal && (
+                <button
+                  className="vs-btn flex items-center gap-2"
+                  onClick={() => handleStart(true)}
+                  disabled={starting || running || !selectedModel}
+                >
+                  {starting ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    <Play size={14} />
+                  )}
+                  {t("bm.resume", { done: String(rows.length), total: String(targetTotal) })}
+                </button>
+              )}
+              {/* Normal start button — always shown */}
               <button
-                className="vs-btn flex items-center gap-2"
-                onClick={handleStart}
+                className={rows.length > 0 ? "vs-btn-secondary flex items-center gap-2" : "vs-btn flex items-center gap-2"}
+                onClick={() => handleStart(false)}
                 disabled={starting || running || !selectedModel}
               >
                 {starting ? (
@@ -390,7 +432,7 @@ export function Benchmark() {
                 ) : (
                   <Play size={14} />
                 )}
-                {t("bm.start")}
+                {rows.length > 0 ? t("bm.restart") : t("bm.start")}
               </button>
               {running && (
                 <button

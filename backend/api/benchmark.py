@@ -33,6 +33,7 @@ class StartBenchmarkRequest(BaseModel):
     retries: int = 2
     max_refill_rounds: int = 4
     adaptive_concurrency: bool = True
+    resume: bool = False
     llm: LlmCtx
 
 
@@ -53,6 +54,23 @@ def _run_benchmark(
 
     target_total = max(1, len(l3_chains) * max(1, int(req.questions_per_chain)))
 
+    # Load existing MCQs when resuming
+    existing_mcqs: List[Dict[str, Any]] = []
+    if req.resume:
+        state_snap = _load_state(project_id)
+        existing_mcqs = list(state_snap.get("benchmark_mcq") or [])
+
+    # Compute how many valid questions we already have (capped per chain)
+    pre_done = 0
+    if existing_mcqs:
+        from collections import Counter
+        chain_counts: Counter = Counter(
+            str(m.get("chain_id", "")) for m in existing_mcqs
+        )
+        for cnt in chain_counts.values():
+            pre_done += min(cnt, int(req.questions_per_chain))
+        pre_done = min(pre_done, target_total)
+
     def on_progress(done: int, total: int) -> None:
         t = max(1, int(total))
         d = int(max(0, min(done, t)))
@@ -68,10 +86,14 @@ def _run_benchmark(
         _reg.update(
             job_id,
             status="running",
-            message=f"Starting benchmark generation on {len(l3_chains)} chains...",
+            message=(
+                f"Resuming benchmark · {pre_done}/{target_total} already done"
+                if req.resume and pre_done > 0
+                else f"Starting benchmark generation on {len(l3_chains)} chains..."
+            ),
             total=target_total,
-            done=0,
-            progress=2,
+            done=pre_done,
+            progress=int(pre_done * 100 / target_total),
         )
         rows = generate_benchmark_mcq(
             l3_chains=l3_chains,
@@ -85,6 +107,7 @@ def _run_benchmark(
             retries=int(req.retries),
             max_refill_rounds=int(req.max_refill_rounds),
             adaptive_concurrency=bool(req.adaptive_concurrency),
+            existing_mcqs=existing_mcqs if existing_mcqs else None,
             progress_callback=on_progress,
             cancel_event=cancel_event,
         )

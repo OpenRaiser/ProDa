@@ -236,6 +236,7 @@ def generate_benchmark_mcq(
     retries: int = 2,
     max_refill_rounds: int = 4,
     adaptive_concurrency: bool = True,
+    existing_mcqs: Optional[List[Dict[str, Any]]] = None,
     progress_callback=None,
     cancel_event: Optional[Event] = None,
 ) -> List[Dict[str, Any]]:
@@ -263,8 +264,33 @@ def generate_benchmark_mcq(
     current_workers = max(1, int(max_workers))
     healthy_streak = 0
 
+    # Build chain_id → chain_idx mapping (used for resume pre-population)
+    chain_id_to_idx: Dict[str, int] = {
+        str(c.get("chain_id", "")): i
+        for i, c in enumerate(l3_chains)
+        if c.get("chain_id")
+    }
+
+    # seen_keys must be initialised before the executor so resume can pre-populate it
+    seen_keys: Dict[int, set] = {i: set() for i in range(len(l3_chains))}
+
+    # --- Resume: restore already-accepted MCQs from a previous run ---
+    if existing_mcqs:
+        for mcq in existing_mcqs:
+            cid = str(mcq.get("chain_id", ""))
+            chain_idx = chain_id_to_idx.get(cid)
+            if chain_idx is None:
+                continue  # chain no longer exists after re-extraction
+            if len(outputs_by_chain[chain_idx]) >= questions_per_chain:
+                continue  # chain already full (e.g. lower qpc requested)
+            outputs_by_chain[chain_idx].append(mcq)
+            seen_keys[chain_idx].add(_mcq_key(mcq))
+            done += 1
+        if progress_callback and done > 0:
+            progress_callback(done, total_planned)
+    # ------------------------------------------------------------------
+
     with ThreadPoolExecutor(max_workers=max_workers) as ex:
-        seen_keys: Dict[int, set[str]] = {i: set() for i in range(len(l3_chains))}
         for round_idx in range(max(1, int(max_refill_rounds))):
             if cancel_event is not None and cancel_event.is_set():
                 break
@@ -278,8 +304,9 @@ def generate_benchmark_mcq(
             if round_idx > 0:
                 stats["refill_rounds"] += 1
 
-            if round_idx > 0:
-                total_planned += sum(deficits.values())
+            # total_planned stays fixed at len(l3_chains)*questions_per_chain;
+            # we do NOT inflate it with refill deficits — that caused the
+            # progress bar to jump backwards every refill round.
 
             pending_chain_indices: List[int] = []
             for chain_idx, need in deficits.items():
@@ -335,12 +362,15 @@ def generate_benchmark_mcq(
                             seen_keys[chain_idx].add(key)
                             outputs_by_chain[chain_idx].append(result)
                             stats["succeeded"] += 1
+                            # Only count genuinely accepted questions; keeps
+                            # done monotonically increasing toward total_planned
+                            # with no jumps caused by refill rounds.
+                            done += 1
+                            if progress_callback:
+                                progress_callback(done, total_planned)
                     else:
                         window_fail += 1
                         stats["failed"] += 1
-                    done += 1
-                    if progress_callback:
-                        progress_callback(done, total_planned)
 
                 fail_rate = window_fail / max(1, len(window))
                 if adaptive_concurrency:
