@@ -291,7 +291,7 @@ export function BottomPanel() {
           >
             {active && (
               <div className="text-[var(--vs-fg-muted)] mb-2 text-[11px]">
-                session <span className="text-white">{active.session_id}</span>{" "}
+                session <span className="text-[var(--vs-fg-strong)]">{active.session_id}</span>{" "}
                 · pid={active.pid} ·{" "}
                 <span
                   className={
@@ -332,7 +332,7 @@ export function BottomPanel() {
           >
             {evalSession && (
               <div className="text-[var(--vs-fg-muted)] mb-2 text-[11px]">
-                run <span className="text-white">{evalSession.run_id}</span> · pid=
+                run <span className="text-[var(--vs-fg-strong)]">{evalSession.run_id}</span> · pid=
                 {evalSession.pid} ·{" "}
                 <span
                   className={evalAlive ? "text-[#4ec9b0]" : "text-[var(--vs-fg-subtle)]"}

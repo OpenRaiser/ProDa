@@ -138,7 +138,7 @@ export function Explorer() {
           actions={
             currentProject && (
               <button
-                className="p-[2px] hover:bg-[var(--vs-selected)] rounded-sm"
+                className="p-[2px] hover:bg-[var(--vs-selected)] hover:text-white rounded-sm"
                 title={t("explorer.close_current")}
                 onClick={(e) => {
                   e.stopPropagation();
@@ -236,7 +236,7 @@ export function Explorer() {
                     {showExpander ? (
                       <button
                         type="button"
-                        className="p-0 m-0 bg-transparent border-0 text-current shrink-0 hover:text-white"
+                        className="p-0 m-0 bg-transparent border-0 text-current shrink-0 hover:text-[var(--vs-fg-strong)]"
                         onClick={(e) => {
                           e.stopPropagation();
                           toggleExpanded();

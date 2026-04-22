@@ -69,7 +69,7 @@ export function JobBanner({ job, labels, extras }: Props) {
               "animate-spin"
           )}
         />
-        <span className="text-[13px] text-white">{label}</span>
+        <span className="text-[13px] text-[var(--vs-fg-strong)]">{label}</span>
         {job.effective_mode && (
           <span className="text-[11px] text-[var(--vs-fg-subtle)] font-mono">
             · mode={job.effective_mode}

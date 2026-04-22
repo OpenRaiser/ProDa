@@ -69,7 +69,7 @@ function ToastRow({
     >
       <Icon size={14} style={{ color: meta.color }} className="shrink-0 mt-0.5" />
       <div className="flex-1 min-w-0">
-        <div className="text-[12.5px] text-white leading-snug">{toast.title}</div>
+        <div className="text-[12.5px] text-[var(--vs-fg-strong)] leading-snug">{toast.title}</div>
         {toast.description && (
           <div className="text-[11px] text-[var(--vs-fg-muted)] mt-0.5 whitespace-pre-wrap break-words">
             {toast.description}
@@ -77,7 +77,7 @@ function ToastRow({
         )}
       </div>
       <button
-        className="p-0.5 text-[var(--vs-fg-muted)] hover:text-white shrink-0"
+        className="p-0.5 text-[var(--vs-fg-muted)] hover:text-[var(--vs-fg-strong)] shrink-0"
         onClick={onDismiss}
         aria-label="Dismiss"
       >

@@ -152,7 +152,7 @@ export function LlmConfigModal() {
       >
         {/* Header */}
         <div className="flex items-center justify-between px-4 h-[42px] border-b border-[var(--vs-border)]">
-          <div className="text-[13px] font-semibold text-white">
+          <div className="text-[13px] font-semibold text-[var(--vs-fg-strong)]">
             {t("llm.title")}
           </div>
           <button
@@ -175,7 +175,7 @@ export function LlmConfigModal() {
                 className={clsx(
                   "px-4 h-[32px] text-[12px] border-b-2",
                   active
-                    ? "border-[var(--vs-accent)] text-white"
+                    ? "border-[var(--vs-accent)] text-[var(--vs-fg-strong)]"
                     : "border-transparent text-[var(--vs-fg-muted)] hover:text-[var(--vs-fg)]"
                 )}
               >

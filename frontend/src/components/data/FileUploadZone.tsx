@@ -100,7 +100,7 @@ export function FileUploadZone({
           {uploads.length} file{uploads.length === 1 ? "" : "s"}
         </span>
         <button
-          className="flex items-center gap-1 text-[12px] text-[var(--vs-fg-muted)] hover:text-white"
+          className="flex items-center gap-1 text-[12px] text-[var(--vs-fg-muted)] hover:text-[var(--vs-fg-strong)]"
           onClick={onRefresh}
         >
           <RefreshCw size={12} />
