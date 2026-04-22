@@ -1,6 +1,6 @@
 ## ProDA
 
-ProDA 是一个面向垂直领域数据构建与模型迭代的 Streamlit WebUI 工作台，目标是把原本分散在脚本中的完整流程统一到一个可视化项目系统中：
+ProDA 是一个面向垂直领域数据构建与模型迭代的 VSCode 风格 React IDE，目标是把原本分散在脚本中的完整流程统一到一个可视化项目系统中：
 
 - 从原始文档中提取知识核心
 - 基于知识核心生成 Benchmark 数据
@@ -10,7 +10,7 @@ ProDA 是一个面向垂直领域数据构建与模型迭代的 Streamlit WebUI 
 - 生成诊断报告与诊断补数据
 - 支持二轮微调与结果回看
 
-这套界面化流程重点面向“文档 -> Benchmark / SFT -> 微调 -> 评测 -> 诊断 -> 迭代”的闭环，而不是单点工具。
+这套界面化流程重点面向"文档 -> Benchmark / SFT -> 微调 -> 评测 -> 诊断 -> 迭代"的闭环，而不是单点工具。
 
 ---
 
@@ -87,7 +87,7 @@ Step2 基于 L3 reasoning chains 生成高质量选择题 Benchmark，支持：
 - 每条链目标题数配置
 - 并发生成
 - 重试
-- 中断
+- 中断与断点续跑
 - 结果预览与导出
 
 ### 4. FineTune 数据生成
@@ -102,7 +102,7 @@ Step3 基于 L1/L2 知识核心生成 SFT 数据，支持：
 
 ### 5. 诊断报告与补数据
 
-Step3 的“诊断报告生成”子页面支持：
+Step3 的"诊断报告生成"子页面支持：
 
 - 选择某次 OpenCompass 评测结果
 - 选择某个本地模型
@@ -155,7 +155,7 @@ Step7 用于统一查看：
 ProDA 当前的主流程建议如下：
 
 1. 创建项目
-2. 在右上角配置并选择可用的 LLM API
+2. 点击左侧活动栏底部的设置图标，配置并选择可用的 LLM API
 3. Step1 上传原始文档，抽取 L1/L2/L3 知识核心
 4. Step2 生成 Benchmark 数据
 5. Step3 生成 FineTune 数据
@@ -178,7 +178,7 @@ conda create -n proda310 python=3.10 -y
 conda activate proda310
 ```
 
-### 2. 安装依赖
+### 2. 安装 Python 依赖
 
 ```bash
 pip install -r requirements.txt
@@ -194,21 +194,38 @@ ProDA 本身是工作台，但训练与评测依赖两个外部项目：
 请确保你本地已经准备好它们的代码仓库，并且路径可访问。  
 ProDA 会优先自动探测默认路径，也允许在运行过程中基于当前环境自动发现。
 
-### 4. 启动 WebUI
+### 4. 安装前端依赖
 
-推荐入口：
-
-```bash
-streamlit run ui/streamlit_app.py
-```
-
-兼容入口：
+需要 Node.js 16+ 和 yarn：
 
 ```bash
-python app.py
+cd frontend
+yarn install
 ```
 
-注意：`app.py` 只用于提示真实入口，主页面已经迁移到 `ui/streamlit_app.py`。
+### 5. 启动后端
+
+```bash
+uvicorn backend.main:app --host 0.0.0.0 --port 8002 --reload --reload-dir backend --reload-dir proda
+```
+
+### 6. 启动前端
+
+在另一个终端中：
+
+```bash
+cd frontend
+yarn dev --host 0.0.0.0 --port 8503
+```
+
+### 7. 打开 IDE
+
+在浏览器中访问 `http://localhost:8503`。  
+如果你在远程服务器上，请先建立 SSH 端口转发：
+
+```bash
+ssh -L 8503:localhost:8503 -L 8002:localhost:8002 <your-server>
+```
 
 ---
 
@@ -217,6 +234,7 @@ python app.py
 ### 必需
 
 - Python `3.10`
+- Node.js `16+` 和 yarn
 - 可访问的 LLM API（至少用于知识抽取 / 数据生成 / 诊断）
 
 ### 训练相关
@@ -251,13 +269,13 @@ python app.py
 
 ### 2. 配置 LLM
 
-在顶部栏配置可用模型：
+点击左侧活动栏底部的设置图标，配置可用模型：
 
 - OpenAI 兼容接口
 - DeepSeek 兼容接口
 - Anthropic 接口
 
-配置完成后，页面右上角的模型下拉会只显示可用配置。
+配置完成后，模型下拉只会显示可用配置。
 
 ### 3. Step1 文档处理
 
@@ -284,7 +302,7 @@ python app.py
 - 温度
 - 重试次数
 
-生成结果会缓存到当前项目。
+生成结果会缓存到当前项目。若上次任务中途中断，可以从断点继续生成。
 
 ### 5. Step3 FineTune 数据生成
 
@@ -330,28 +348,34 @@ python app.py
 
 ```text
 ProDA/
-├── app.py
 ├── requirements.txt
-├── proda/
+├── proda/                        # 核心流水线逻辑
 │   ├── extractor.py
 │   ├── benchmark_generator.py
 │   ├── finetune_generator.py
 │   ├── diagnosis.py
 │   ├── diagnosis_supplement.py
 │   └── evaluator.py
-├── ui/
-│   ├── streamlit_app.py
-│   ├── components/
-│   ├── locales/
-│   ├── pages/
-│   │   ├── 1_Data_Processing.py
-│   │   ├── 2_Benchmark_Generation.py
-│   │   ├── 3_Finetune_Generation.py
-│   │   ├── 5_Fine_Tuning.py
-│   │   ├── 7_OpenCompass_Evaluation.py
-│   │   └── 8_Results.py
-│   └── utils/
-└── .proda_projects/
+├── backend/                      # FastAPI 后端（端口 8002）
+│   ├── main.py
+│   └── api/
+│       ├── benchmark.py
+│       ├── extraction.py
+│       ├── finetune.py
+│       ├── fine_tuning.py
+│       ├── opencompass.py
+│       └── results.py
+├── frontend/                     # React + Vite IDE（端口 8503）
+│   ├── src/
+│   │   ├── components/ide/       # ActivityBar、TabBar、StatusBar 等
+│   │   ├── pages/                # DataProcessing、Benchmark、FineTune 等
+│   │   ├── store/                # Zustand 状态管理
+│   │   ├── hooks/
+│   │   ├── lib/                  # i18n、API 客户端
+│   │   └── types/
+│   ├── package.json
+│   └── vite.config.ts
+└── .proda_projects/              # 各项目的状态与产物
 ```
 
 ---
@@ -377,20 +401,20 @@ ProDA/
 
 ## 常见问题
 
-### 1. 为什么启动后页面空白或打不开？
+### 1. 为什么页面打不开？
 
 请优先确认：
 
-- 是否使用 `streamlit run ui/streamlit_app.py`
-- 端口是否可访问
-- 当前集群 / 节点是否允许对外映射
+- 后端（端口 8002）和前端（端口 8503）是否都已启动
+- 如果在远程服务器上，SSH 端口转发是否包含了两个端口
+- 浏览器能否访问 `http://localhost:8503`
 
 ### 2. 为什么知识抽取按钮不可用？
 
 通常是因为：
 
 - 尚未上传文件
-- 没有在顶部选择可用模型
+- 没有在设置面板中配置并选择可用模型
 - API Key / Base URL 未配置完整
 
 ### 3. 为什么 Step5 找不到训练数据？
@@ -423,7 +447,7 @@ Step5 只会从当前项目的可训练数据集中选择数据。
 
 - 文档处理
 - 知识核心抽取
-- Benchmark 生成
+- Benchmark 生成（支持断点续跑）
 - FineTune 数据生成
 - 本地训练
 - OpenCompass 评测
