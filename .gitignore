@@ -1,6 +1,6 @@
 # External repos (cloned separately)
-LLaMA-Factory/
-opencompass/
+/LLaMA-Factory/
+/opencompass/
 
 # Project outputs
 .proda_projects/
