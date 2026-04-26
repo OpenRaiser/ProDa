@@ -39,7 +39,7 @@ export function FineTune() {
       {/* Breadcrumb-style segmented control — matches VSCode editor breadcrumb feel */}
       <div className="flex items-center gap-[2px] h-[28px] px-4 border-b border-[var(--vs-border)] bg-[var(--vs-sidebar)] shrink-0">
         <Folder size={13} className="text-[#dcb67a] mr-1" />
-        <span className="text-[12px] text-[var(--vs-fg-muted)] mr-2">finetune</span>
+        <span className="text-[12px] text-[var(--vs-fg-muted)] mr-2">{t("ft.breadcrumb")}</span>
         <span className="text-[12px] text-[var(--vs-fg-subtle)] mr-2">›</span>
         {SEGMENTS.map((seg) => {
           const active = section === seg.id;

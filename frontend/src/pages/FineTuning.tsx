@@ -32,6 +32,8 @@ import {
   envCheck,
   envSettingsPut,
   getHistory,
+  getLogs,
+  getMetrics,
   getOutputTree,
   listDatasets,
   listModels,
@@ -79,6 +81,11 @@ export function FineTuning() {
   const active = useSession((s) => s.activeTrainingSession);
   const preselectedSessionId = useSession((s) => s.preselectedTrainSessionId);
   const setPreselectedSessionId = useSession((s) => s.setPreselectedTrainSessionId);
+  const setActiveTrainingSession = useSession((s) => s.setActiveTrainingSession);
+  const clearTrainingLogs = useSession((s) => s.clearTrainingLogs);
+  const appendTrainingLog = useSession((s) => s.appendTrainingLog);
+  const setTrainingMetrics = useSession((s) => s.setTrainingMetrics);
+  const setTrainingPanelTab = useSession((s) => s.setTrainingPanelTab);
 
   const [env, setEnv] = useState<EnvCheck | null>(null);
   const [envLoading, setEnvLoading] = useState(false);
@@ -102,6 +109,36 @@ export function FineTuning() {
   const [canceling, setCanceling] = useState(false);
 
   const [outputTree, setOutputTree] = useState<OutputTreeEntry[]>([]);
+
+  const handleSelectHistory = useCallback(
+    async (session: TrainingSession) => {
+      if (!project) return;
+      setActiveTrainingSession({ ...session, alive: false });
+      setTrainingPanelTab("log");
+      clearTrainingLogs();
+      try {
+        const [logsRes, metricsRes, outputRes] = await Promise.all([
+          getLogs(project.id, session.session_id, 1200),
+          getMetrics(project.id, session.session_id, 4000),
+          getOutputTree(project.id, session.session_id),
+        ]);
+        const lines = (logsRes.text || "").split("\n").filter((x) => x.trim().length > 0);
+        lines.forEach((line) => appendTrainingLog(line));
+        setTrainingMetrics(metricsRes.points ?? []);
+        setOutputTree(outputRes.entries ?? []);
+      } catch {
+        // best effort: keep selected session visible even if log/metric fetch fails
+      }
+    },
+    [
+      appendTrainingLog,
+      clearTrainingLogs,
+      project,
+      setActiveTrainingSession,
+      setTrainingMetrics,
+      setTrainingPanelTab,
+    ]
+  );
 
   // Refresh env + discovery
   const refreshEnv = useCallback(async () => {
@@ -699,6 +736,7 @@ export function FineTuning() {
           history={history}
           highlightedSessionId={preselectedSessionId}
           onHighlightConsumed={() => setPreselectedSessionId(null)}
+          onSelect={handleSelectHistory}
         />
 
         {/* Next step */}
@@ -813,7 +851,7 @@ function EnvBanner({
         {expanded && (
           <div className="mt-3 border-t border-[var(--vs-border)] pt-3 space-y-2">
             <div>
-              <label className="vs-label">LLaMA-Factory path</label>
+              <label className="vs-label">{t("ftune.llamafactory_path")}</label>
               <input
                 className="vs-input font-mono"
                 value={edit.llamafactory_path}
@@ -823,7 +861,7 @@ function EnvBanner({
               />
             </div>
             <div>
-              <label className="vs-label">Model root</label>
+              <label className="vs-label">{t("ftune.model_root")}</label>
               <input
                 className="vs-input font-mono"
                 value={edit.model_root}
@@ -1101,10 +1139,12 @@ function HistoryList({
   history,
   highlightedSessionId,
   onHighlightConsumed,
+  onSelect,
 }: {
   history: TrainingSession[];
   highlightedSessionId?: string | null;
   onHighlightConsumed?: () => void;
+  onSelect?: (session: TrainingSession) => void;
 }) {
   const { t } = useI18n();
   const highlightRef = useRef<HTMLDivElement | null>(null);
@@ -1151,8 +1191,9 @@ function HistoryList({
                 "flex items-center gap-3 px-2 py-1 text-[12px] rounded-sm transition-colors",
                 isHighlighted
                   ? "bg-[var(--vs-accent-bg)] outline outline-1 outline-[var(--vs-accent)]"
-                  : "hover:bg-[var(--vs-hover)]"
+                  : "hover:bg-[var(--vs-hover)] cursor-pointer"
               )}
+              onClick={() => onSelect?.(h)}
             >
               <span
                 className="w-[6px] h-[6px] rounded-full shrink-0"

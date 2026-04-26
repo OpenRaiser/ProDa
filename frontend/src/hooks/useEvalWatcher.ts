@@ -29,7 +29,24 @@ export function useEvalWatcher() {
       try {
         const a = await getActiveEval(pid);
         if (cancelled) return;
-        setActive(a);
+        if (a) {
+          setActive(a);
+          return;
+        }
+        // Keep the last finished run visible for log/progress inspection.
+        const prev = useSession.getState().activeEvalSession;
+        if (prev) {
+          setActive({
+            ...prev,
+            alive: false,
+            status:
+              prev.status && prev.status !== "running"
+                ? prev.status
+                : "finished",
+          });
+        } else {
+          setActive(null);
+        }
       } catch {
         /* ignore */
       }

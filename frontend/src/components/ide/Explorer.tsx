@@ -18,11 +18,15 @@ import { usePageLabels } from "@/hooks/usePageLabels";
 import { listProjects, openProject } from "@/api/projects";
 import type { FineTuneSection, Project } from "@/types";
 
-const FINETUNE_CHILDREN: Array<{ id: FineTuneSection; file: string }> = [
-  { id: "generate", file: "generate.py" },
-  { id: "diagnose", file: "diagnose.py" },
-  { id: "supplement", file: "supplement.py" },
-  { id: "merge", file: "merge.py" },
+const FINETUNE_CHILDREN: Array<{
+  id: FineTuneSection;
+  file: string;
+  labelKey: string;
+}> = [
+  { id: "generate", file: "generate.py", labelKey: "ft.seg_generate" },
+  { id: "diagnose", file: "diagnose.py", labelKey: "ft.seg_diagnose" },
+  { id: "supplement", file: "supplement.py", labelKey: "ft.seg_supplement" },
+  { id: "merge", file: "merge.py", labelKey: "ft.seg_merge" },
 ];
 
 function SectionHeader({
@@ -253,7 +257,7 @@ export function Explorer() {
                       <span className="w-[12px] shrink-0" />
                     )}
                     <FileCode2 size={14} className="text-[#519aba] shrink-0" />
-                    <span className="truncate flex-1">{step.file}</span>
+                    <span className="truncate flex-1">{t(step.key)}</span>
                     {isFineTuning && activeTraining?.alive && (
                       <span
                         className="w-[6px] h-[6px] rounded-full bg-[#c586c0] animate-pulse"
@@ -286,13 +290,13 @@ export function Explorer() {
                               setFinetuneSection(child.id);
                               openTab(buildTab("finetune"));
                             }}
-                            title={child.file}
+                            title={t(child.labelKey)}
                           >
                             <FileCode2
                               size={13}
                               className="text-[#6e9fd2] shrink-0"
                             />
-                            <span className="truncate">{child.file}</span>
+                            <span className="truncate">{t(child.labelKey)}</span>
                           </div>
                         );
                       })}

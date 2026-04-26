@@ -8,7 +8,7 @@ export function usePageLabels() {
   const pageTitle = (pageId: PageId): string => {
     switch (pageId) {
       case "welcome":
-        return "Welcome";
+        return t("page.welcome.title", "Welcome");
       case "llm_config":
         return t("llm.title");
       default: {

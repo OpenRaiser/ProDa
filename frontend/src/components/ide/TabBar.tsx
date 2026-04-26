@@ -1,24 +1,29 @@
 import { X, FileText, FileCode2 } from "lucide-react";
 import clsx from "clsx";
 import { useSession } from "@/store/useSession";
+import { usePageLabels } from "@/hooks/usePageLabels";
 
 export function TabBar() {
   const tabs = useSession((s) => s.openTabs);
   const activeTabId = useSession((s) => s.activeTabId);
   const setActiveTab = useSession((s) => s.setActiveTab);
   const closeTab = useSession((s) => s.closeTab);
+  const { pageTitle, pageFile } = usePageLabels();
 
   return (
     <div className="h-[35px] flex items-end bg-[var(--vs-sidebar)] overflow-x-auto overflow-y-hidden scrollbar-none">
       <div className="flex items-center h-full">
         {tabs.map((tab) => {
           const active = tab.id === activeTabId;
-          const Icon = tab.fileName.endsWith(".py")
+          // Recompute labels from pageId so tab text reacts to i18n language switch.
+          const fileName = pageFile(tab.pageId);
+          const title = pageTitle(tab.pageId);
+          const Icon = fileName.endsWith(".py")
             ? FileCode2
             : FileText;
-          const iconColor = tab.fileName.endsWith(".py")
+          const iconColor = fileName.endsWith(".py")
             ? "text-[#519aba]"
-            : tab.fileName.endsWith(".md")
+            : fileName.endsWith(".md")
             ? "text-[#519aba]"
             : "text-[#cbcb41]";
           return (
@@ -38,10 +43,10 @@ export function TabBar() {
                   ? "1px solid #3794ff"
                   : "1px solid transparent",
               }}
-              title={tab.fileName}
+              title={title}
             >
               <Icon size={14} className={clsx(iconColor, "shrink-0")} />
-              <span className="truncate flex-1">{tab.fileName}</span>
+              <span className="truncate flex-1">{title}</span>
               {tab.closable ? (
                 <button
                   onClick={(e) => {

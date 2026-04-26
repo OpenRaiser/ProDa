@@ -202,7 +202,7 @@ export function CommandPalette() {
         <div className="max-h-[340px] overflow-auto">
           {filtered.length === 0 ? (
             <div className="px-3 py-3 text-[12px] text-[var(--vs-fg-muted)]">
-              No matching commands
+              {t("command.no_match")}
             </div>
           ) : (
             filtered.map((c, i) => {

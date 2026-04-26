@@ -26,19 +26,19 @@ import { useSession } from "@/store/useSession";
 import { useI18n } from "@/hooks/useI18n";
 
 const BASE_TABS = [
-  { id: "problems", icon: AlertCircle, label: "PROBLEMS" },
-  { id: "output", icon: Activity, label: "OUTPUT" },
-  { id: "ports", icon: Package, label: "PORTS" },
+  { id: "problems", icon: AlertCircle, labelKey: "bottompanel.tab_problems" },
+  { id: "output", icon: Activity, labelKey: "bottompanel.tab_output" },
+  { id: "ports", icon: Package, labelKey: "bottompanel.tab_ports" },
 ] as const;
 
 const TRAINING_TABS = [
-  { id: "finetune_log", icon: Sparkles, label: "FINETUNE LOG" },
-  { id: "finetune_metrics", icon: FlaskConical, label: "FINETUNE METRICS" },
+  { id: "finetune_log", icon: Sparkles, labelKey: "bottompanel.tab_finetune_log" },
+  { id: "finetune_metrics", icon: FlaskConical, labelKey: "bottompanel.tab_finetune_metrics" },
 ] as const;
 
 const EVAL_TABS = [
-  { id: "opencompass_log", icon: ScrollText, label: "OPENCOMPASS LOG" },
-  { id: "opencompass_progress", icon: Gauge, label: "OPENCOMPASS PROGRESS" },
+  { id: "opencompass_log", icon: ScrollText, labelKey: "bottompanel.tab_opencompass_log" },
+  { id: "opencompass_progress", icon: Gauge, labelKey: "bottompanel.tab_opencompass_progress" },
 ] as const;
 
 type BaseId = (typeof BASE_TABS)[number]["id"];
@@ -206,7 +206,7 @@ export function BottomPanel() {
                 size={12}
                 style={pulse ? { color: accent } : undefined}
               />
-              {tab.label}
+              {t(tab.labelKey)}
               {tab.id === "problems" && problems.length > 0 && (
                 <span
                   className="ml-1 px-1.5 rounded-full text-[10px] font-semibold"
@@ -241,22 +241,27 @@ export function BottomPanel() {
               tag="INFO"
               color="text-[var(--vs-accent)]"
             >
-              ProDa frontend started on http://localhost:5173
+              {t("bottompanel.frontend_started", { url: "http://localhost:5173" })}
             </Line_>
             <Line_
               tag={backendOnline ? "INFO" : "WARN"}
               color={backendOnline ? "text-[#4ec9b0]" : "text-[#dcdcaa]"}
             >
-              Backend: {backendOnline ? "connected" : "disconnected"}{" "}
-              (http://localhost:8001)
+              {t("bottompanel.backend_status", {
+                status: backendOnline ? t("bottompanel.status_connected") : t("bottompanel.status_disconnected"),
+                url: "http://localhost:8001",
+              })}
             </Line_>
             {currentProject ? (
               <Line_ tag="INFO" color="text-[var(--vs-accent)]">
-                Active project: {currentProject.name} ({currentProject.id})
+                {t("bottompanel.active_project", {
+                  name: currentProject.name,
+                  id: currentProject.id,
+                })}
               </Line_>
             ) : (
               <Line_ tag="INFO" color="text-[var(--vs-fg-muted)]">
-                No project opened. Use Welcome page to create or open one.
+                {t("bottompanel.no_project_opened")}
               </Line_>
             )}
           </div>
@@ -265,22 +270,22 @@ export function BottomPanel() {
         {active_ === "ports" && (
           <div className="text-[var(--vs-fg-muted)]">
             <div className="grid grid-cols-4 gap-4 font-sans text-[11px] uppercase tracking-wider mb-2">
-              <span>Port</span>
-              <span>Process</span>
-              <span>Forwarded Address</span>
-              <span>Visibility</span>
+              <span>{t("bottompanel.port_col_port")}</span>
+              <span>{t("bottompanel.port_col_process")}</span>
+              <span>{t("bottompanel.port_col_forwarded_address")}</span>
+              <span>{t("bottompanel.port_col_visibility")}</span>
             </div>
             <div className="grid grid-cols-4 gap-4 font-sans text-[12px] text-[var(--vs-fg)]">
               <span>5173</span>
               <span>vite</span>
               <span>http://localhost:5173</span>
-              <span>Private</span>
+              <span>{t("bottompanel.port_visibility_private")}</span>
             </div>
             <div className="grid grid-cols-4 gap-4 font-sans text-[12px] text-[var(--vs-fg)]">
               <span>8001</span>
               <span>uvicorn</span>
               <span>http://localhost:8001</span>
-              <span>Private</span>
+              <span>{t("bottompanel.port_visibility_private")}</span>
             </div>
           </div>
         )}
@@ -291,14 +296,14 @@ export function BottomPanel() {
           >
             {active && (
               <div className="text-[var(--vs-fg-muted)] mb-2 text-[11px]">
-                session <span className="text-[var(--vs-fg-strong)]">{active.session_id}</span>{" "}
+                {t("bottompanel.session_label")} <span className="text-[var(--vs-fg-strong)]">{active.session_id}</span>{" "}
                 · pid={active.pid} ·{" "}
                 <span
                   className={
                     sessionAlive ? "text-[#4ec9b0]" : "text-[var(--vs-fg-subtle)]"
                   }
                 >
-                  {sessionAlive ? "running" : "finished"}
+                  {sessionAlive ? t("bottompanel.status_running") : t("bottompanel.status_finished")}
                 </span>
               </div>
             )}
@@ -314,14 +319,14 @@ export function BottomPanel() {
         {active_ === "finetune_metrics" && (
           <div className="space-y-4">
             <div className="text-[11px] text-[var(--vs-fg-muted)] font-mono">
-              step {latestStep}
+              {t("bottompanel.step_label")} {latestStep}
               {totalSteps ? `/${totalSteps}` : ""}
-              {lossPoints.length > 0 && ` · loss ${(lossPoints[lossPoints.length - 1].loss ?? 0).toFixed(4)}`}
-              {lrPoints.length > 0 && ` · lr ${(lrPoints[lrPoints.length - 1].lr ?? 0).toExponential(2)}`}
+              {lossPoints.length > 0 && ` · ${t("bottompanel.metric_loss")} ${(lossPoints[lossPoints.length - 1].loss ?? 0).toFixed(4)}`}
+              {lrPoints.length > 0 && ` · ${t("bottompanel.lr_short")} ${(lrPoints[lrPoints.length - 1].lr ?? 0).toExponential(2)}`}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <MiniChart title="Loss" data={lossPoints} dataKey="loss" color="var(--vs-accent)" />
-              <MiniChart title="Learning rate" data={lrPoints} dataKey="lr" color="#c586c0" />
+              <MiniChart title={t("bottompanel.metric_loss")} data={lossPoints} dataKey="loss" color="var(--vs-accent)" />
+              <MiniChart title={t("bottompanel.metric_learning_rate")} data={lrPoints} dataKey="lr" color="#c586c0" />
             </div>
           </div>
         )}
@@ -332,12 +337,12 @@ export function BottomPanel() {
           >
             {evalSession && (
               <div className="text-[var(--vs-fg-muted)] mb-2 text-[11px]">
-                run <span className="text-[var(--vs-fg-strong)]">{evalSession.run_id}</span> · pid=
+                {t("bottompanel.run_label")} <span className="text-[var(--vs-fg-strong)]">{evalSession.run_id}</span> · pid=
                 {evalSession.pid} ·{" "}
                 <span
                   className={evalAlive ? "text-[#4ec9b0]" : "text-[var(--vs-fg-subtle)]"}
                 >
-                  {evalAlive ? "running" : "finished"}
+                  {evalAlive ? t("bottompanel.status_running") : t("bottompanel.status_finished")}
                 </span>
               </div>
             )}
@@ -357,6 +362,7 @@ export function BottomPanel() {
 }
 
 function EvalProgressPanel() {
+  const { t } = useI18n();
   const evalSession = useSession((s) => s.activeEvalSession);
   const evalLogs = useSession((s) => s.evalLogs);
 
@@ -393,12 +399,12 @@ function EvalProgressPanel() {
       <div className="text-[11px] text-[var(--vs-fg-muted)] font-mono">
         {evalSession ? (
           <>
-            run {evalSession.run_id} · pid={evalSession.pid}
-            {dataset && ` · dataset=${dataset}`}
+            {t("bottompanel.run_label")} {evalSession.run_id} · pid={evalSession.pid}
+            {dataset && ` · ${t("bottompanel.dataset_label")}=${dataset}`}
             {total > 0 && ` · ${current}/${total}`}
           </>
         ) : (
-          "no active eval"
+          t("bottompanel.no_active_eval")
         )}
       </div>
       <div className="h-[8px] bg-[var(--vs-panel)] rounded-sm overflow-hidden">
@@ -413,7 +419,7 @@ function EvalProgressPanel() {
       {recent && (
         <div>
           <div className="text-[10px] uppercase tracking-wider text-[var(--vs-fg-heading)] mb-1">
-            recent
+            {t("bottompanel.recent_logs")}
           </div>
           <pre className="whitespace-pre-wrap text-[11px] text-[var(--vs-fg)] leading-[1.4]">
             {recent}
@@ -435,6 +441,7 @@ function MiniChart({
   dataKey: "loss" | "lr";
   color: string;
 }) {
+  const { t } = useI18n();
   return (
     <div>
       <div className="text-[11px] uppercase tracking-wider text-[var(--vs-fg-heading)] mb-1">
@@ -442,7 +449,7 @@ function MiniChart({
       </div>
       {data.length === 0 ? (
         <div className="h-[160px] flex items-center justify-center text-[11px] text-[var(--vs-fg-subtle)] italic">
-          no data yet
+          {t("bottompanel.no_data_yet")}
         </div>
       ) : (
         <div style={{ width: "100%", height: 160 }}>

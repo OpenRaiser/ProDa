@@ -25,7 +25,9 @@ import { useI18n } from "@/hooks/useI18n";
 import { usePageLabels } from "@/hooks/usePageLabels";
 import {
   cancelEval,
+  deleteEvalRun,
   getFlowSuggestion,
+  getEvalLogs,
   listBenchmarks,
   listEvalHistory,
   listPeftCandidates,
@@ -83,6 +85,11 @@ export function OpenCompass() {
   const project = useSession((s) => s.currentProject);
   const openTab = useSession((s) => s.openTab);
   const active = useSession((s) => s.activeEvalSession);
+  const evalLogs = useSession((s) => s.evalLogs);
+  const setActiveEvalSession = useSession((s) => s.setActiveEvalSession);
+  const clearEvalLogs = useSession((s) => s.clearEvalLogs);
+  const appendEvalLog = useSession((s) => s.appendEvalLog);
+  const setEvalPanelTab = useSession((s) => s.setEvalPanelTab);
 
   const [env, setEnv] = useState<EvalEnvCheck | null>(null);
   const [envLoading, setEnvLoading] = useState(false);
@@ -166,8 +173,10 @@ export function OpenCompass() {
       const hist = await listEvalHistory(project.id);
       setHistory(hist);
       if (hist.length && !pickedRun) setPickedRun(hist[0].run_id);
+      return hist;
     } catch {
       /* ignore */
+      return [] as EvalSession[];
     }
   }, [project, pickedRun]);
 
@@ -203,6 +212,38 @@ export function OpenCompass() {
     refreshHistory();
   }, [active?.run_id, active?.alive, refreshHistory]);
 
+  // Load historical logs when switching selected run so users can inspect
+  // finished runs and still use StatusBar "log/progress" shortcuts.
+  useEffect(() => {
+    if (!project || !pickedRun) return;
+    const picked = history.find((h) => h.run_id === pickedRun);
+    if (!picked) return;
+    if (active?.run_id === pickedRun && evalLogs.length > 0) return;
+    setActiveEvalSession({ ...picked, alive: picked.alive ?? false });
+    setEvalPanelTab("log");
+    clearEvalLogs();
+    getEvalLogs(project.id, pickedRun, 1200)
+      .then((res) => {
+        (res.text || "")
+          .split("\n")
+          .filter((x) => x.trim().length > 0)
+          .forEach((line) => appendEvalLog(line));
+      })
+      .catch(() => {
+        // ignore: run details UI still works without log tail
+      });
+  }, [
+    active?.run_id,
+    appendEvalLog,
+    clearEvalLogs,
+    evalLogs.length,
+    history,
+    pickedRun,
+    project,
+    setActiveEvalSession,
+    setEvalPanelTab,
+  ]);
+
   // Debounced preview — skip if models are incomplete
   useEffect(() => {
     if (!project) return;
@@ -230,7 +271,7 @@ export function OpenCompass() {
         if (Array.isArray(detail)) msg = JSON.stringify(detail);
         else if (typeof detail === "string") msg = detail;
         else if (detail && typeof detail === "object") msg = JSON.stringify(detail);
-        else msg = err?.message ?? "Preview failed";
+        else msg = err?.message ?? t("oc.err_preview_failed");
         setPreviewYaml("");
         setPreviewError(msg);
       } finally {
@@ -270,7 +311,7 @@ export function OpenCompass() {
       setBenchmarkPath(up.path);
     } catch (e: unknown) {
       const err = e as { message?: string };
-      setLaunchError(err?.message ?? "Upload failed");
+      setLaunchError(err?.message ?? t("oc.err_upload_failed"));
     }
   };
 
@@ -333,7 +374,7 @@ export function OpenCompass() {
       if (Array.isArray(detail)) msg = JSON.stringify(detail);
       else if (typeof detail === "string") msg = detail;
       else if (detail && typeof detail === "object") msg = JSON.stringify(detail);
-      else msg = err?.message ?? "Launch failed";
+      else msg = err?.message ?? t("oc.err_launch_failed");
       setLaunchError(msg);
     } finally {
       setLaunching(false);
@@ -349,6 +390,20 @@ export function OpenCompass() {
       /* ignore */
     } finally {
       setCanceling(false);
+    }
+  };
+
+  const handleDeleteRun = async () => {
+    if (!project || !pickedRun) return;
+    if (!window.confirm(t("oc.delete_run_confirm", { run: pickedRun }))) return;
+    try {
+      await deleteEvalRun(project.id, pickedRun);
+      const hist = await refreshHistory();
+      const next = (hist ?? []).find((h) => h.run_id !== pickedRun);
+      setPickedRun(next?.run_id ?? "");
+    } catch (e: unknown) {
+      const err = e as { message?: string };
+      setLaunchError(err?.message ?? t("oc.err_delete_failed"));
     }
   };
 
@@ -435,7 +490,7 @@ export function OpenCompass() {
             {envExpanded && (
               <div className="mt-3 border-t border-[var(--vs-border)] pt-3 space-y-2">
                 <div>
-                  <label className="vs-label">OpenCompass path</label>
+                  <label className="vs-label">{t("oc.opencompass_path_label")}</label>
                   <input
                     className="vs-input font-mono"
                     value={envEdit.opencompass_path}
@@ -656,14 +711,14 @@ export function OpenCompass() {
             <table className="w-full text-[12px] border-collapse">
               <thead className="bg-[var(--vs-sidebar)] text-[11px] uppercase tracking-wider text-[var(--vs-fg-muted)]">
                 <tr>
-                  <th className="px-2 py-1 text-left w-[42px]">on</th>
-                  <th className="px-2 py-1 text-left w-[90px]">type</th>
-                  <th className="px-2 py-1 text-left w-[170px]">abbr</th>
-                  <th className="px-2 py-1 text-left">path / model id</th>
-                  <th className="px-2 py-1 text-left">peft_path / api_base</th>
-                  <th className="px-2 py-1 text-left w-[100px]">api_key</th>
-                  <th className="px-2 py-1 text-left w-[48px]">bs</th>
-                  <th className="px-2 py-1 text-left w-[48px]">gpu</th>
+                  <th className="px-2 py-1 text-left w-[42px]">{t("oc.model_col_on")}</th>
+                  <th className="px-2 py-1 text-left w-[90px]">{t("oc.model_col_type")}</th>
+                  <th className="px-2 py-1 text-left w-[170px]">{t("oc.model_col_abbr")}</th>
+                  <th className="px-2 py-1 text-left">{t("oc.model_col_path")}</th>
+                  <th className="px-2 py-1 text-left">{t("oc.model_col_extra")}</th>
+                  <th className="px-2 py-1 text-left w-[100px]">{t("oc.model_col_api_key")}</th>
+                  <th className="px-2 py-1 text-left w-[48px]">{t("oc.model_col_bs")}</th>
+                  <th className="px-2 py-1 text-left w-[48px]">{t("oc.model_col_gpu")}</th>
                   <th className="px-2 py-1 text-center w-[36px]"></th>
                 </tr>
               </thead>
@@ -701,8 +756,8 @@ export function OpenCompass() {
                           setModels(next);
                         }}
                       >
-                        <option value="local">local</option>
-                        <option value="api">api</option>
+                        <option value="local">{t("oc.model_type_local")}</option>
+                        <option value="api">{t("oc.model_type_api")}</option>
                       </select>
                     </td>
                     <td className="px-2 py-1">
@@ -721,7 +776,7 @@ export function OpenCompass() {
                         className="vs-input h-[24px] py-0 font-mono text-[12px]"
                         value={m.path}
                         placeholder={
-                          m.is_local ? "/path/to/base-model" : "gpt-4o-mini"
+                          m.is_local ? t("oc.model_path_placeholder_local") : t("oc.model_path_placeholder_api")
                         }
                         onChange={(e) => {
                           const next = [...models];
@@ -736,8 +791,8 @@ export function OpenCompass() {
                         value={m.is_local ? m.peft_path : m.api_base}
                         placeholder={
                           m.is_local
-                            ? "(optional) /path/to/lora"
-                            : "(optional) https://api.xxx.com"
+                            ? t("oc.model_extra_placeholder_local")
+                            : t("oc.model_extra_placeholder_api")
                         }
                         onChange={(e) => {
                           const next = [...models];
@@ -754,7 +809,7 @@ export function OpenCompass() {
                         type={m.is_local ? "text" : "password"}
                         disabled={m.is_local}
                         value={m.is_local ? "" : m.api_key}
-                        placeholder={m.is_local ? "—" : "sk-..."}
+                        placeholder={m.is_local ? "—" : t("oc.model_api_key_placeholder")}
                         onChange={(e) => {
                           const next = [...models];
                           next[i] = { ...m, api_key: e.target.value };
@@ -956,7 +1011,7 @@ export function OpenCompass() {
                 >
                   {history.map((h) => (
                     <option key={h.run_id} value={h.run_id}>
-                      {h.run_id} · {h.status ?? "?"} ·{" "}
+                      {h.run_id} · {h.status ?? t("common.unknown")} ·{" "}
                       {(h.models || [])
                         .map((m) =>
                           typeof m === "string" ? m : m?.abbr ?? ""
@@ -966,6 +1021,14 @@ export function OpenCompass() {
                     </option>
                   ))}
                 </select>
+                <button
+                  className="vs-btn-ghost p-2 text-[#f48771]"
+                  onClick={handleDeleteRun}
+                  disabled={!pickedRun || running}
+                  title={t("oc.delete_run")}
+                >
+                  <Trash2 size={13} />
+                </button>
               </div>
             </div>
             <div className="vs-card overflow-hidden">

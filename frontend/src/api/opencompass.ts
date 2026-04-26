@@ -106,6 +106,16 @@ export async function getEvalRun(
   return data as EvalResult;
 }
 
+export async function deleteEvalRun(
+  projectId: string,
+  runId: string
+): Promise<{ deleted: boolean; run_id: string }> {
+  const { data } = await api.delete(
+    `/opencompass/${projectId}/runs/${encodeURIComponent(runId)}`
+  );
+  return data;
+}
+
 export async function getRunSamples(
   projectId: string,
   runId: string,

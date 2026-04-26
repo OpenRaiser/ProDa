@@ -34,7 +34,25 @@ export function useTrainingWatcher() {
       try {
         const a = await getActive(pid);
         if (cancelled) return;
-        setActive(a);
+        if (a) {
+          setActive(a);
+          return;
+        }
+        // Preserve the last session in UI after it finishes, so logs/metrics
+        // remain visible until user starts another run or switches project.
+        const prev = useSession.getState().activeTrainingSession;
+        if (prev) {
+          setActive({
+            ...prev,
+            alive: false,
+            status:
+              prev.status && prev.status !== "running"
+                ? prev.status
+                : "finished",
+          });
+        } else {
+          setActive(null);
+        }
       } catch {
         /* ignore */
       }

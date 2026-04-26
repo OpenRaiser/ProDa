@@ -7,6 +7,7 @@ import json
 import os
 import platform
 import re
+import shutil
 import subprocess
 import sys
 import threading
@@ -670,6 +671,42 @@ def _load_run_result(project_id: str, run_id: str) -> Dict[str, Any]:
                     return data
             return row
     raise HTTPException(status_code=404, detail="Run not found")
+
+
+@router.delete("/{project_id}/runs/{run_id}")
+def delete_run(project_id: str, run_id: str) -> Dict[str, Any]:
+    _assert_project(project_id)
+    rid = str(run_id).strip()
+    if not rid:
+        raise HTTPException(status_code=400, detail="run_id is required")
+
+    with _project_lock(project_id):
+        _finalize_if_dead(project_id)
+        active = _load_active(project_id)
+        if active and str(active.get("run_id", "")).strip() == rid:
+            raise HTTPException(
+                status_code=409,
+                detail="Cannot delete an active eval run",
+            )
+
+        rows = _load_history(project_id)
+        target: Optional[Dict[str, Any]] = None
+        remained: List[Dict[str, Any]] = []
+        for row in rows:
+            if str(row.get("run_id", "")).strip() == rid and target is None:
+                target = row
+                continue
+            remained.append(row)
+        if target is None:
+            raise HTTPException(status_code=404, detail="Run not found")
+
+        run_dir = _runs_dir(project_id) / rid
+        if run_dir.exists() and _is_within(run_dir, _oc_root(project_id)):
+            shutil.rmtree(run_dir, ignore_errors=True)
+
+        _save_history(project_id, remained)
+
+    return {"deleted": True, "run_id": rid}
 
 
 @router.get("/{project_id}/runs/{run_id}")

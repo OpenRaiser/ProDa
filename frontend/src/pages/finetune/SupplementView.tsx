@@ -603,6 +603,9 @@ export function SupplementView() {
                           <th className="px-2 py-[6px] text-left text-[11px] uppercase tracking-wider text-[var(--vs-fg-muted)] border-b border-[var(--vs-border)] font-semibold">
                             {t("sup.col_question")}
                           </th>
+                          <th className="px-2 py-[6px] text-left text-[11px] uppercase tracking-wider text-[var(--vs-fg-muted)] border-b border-[var(--vs-border)] font-semibold w-[260px]">
+                            {t("sup.col_options")}
+                          </th>
                           <th className="px-2 py-[6px] text-left text-[11px] uppercase tracking-wider text-[var(--vs-fg-muted)] border-b border-[var(--vs-border)] font-semibold w-[120px]">
                             {t("sup.col_answer")}
                           </th>
@@ -626,7 +629,10 @@ export function SupplementView() {
                             <td className="px-2 py-[4px] align-top text-[var(--vs-fg)] leading-[1.45]">
                               {String(r.question ?? "")}
                             </td>
-                            <td className="px-2 py-[4px] align-top text-[var(--vs-fg)] truncate max-w-[200px]">
+                            <td className="px-2 py-[4px] align-top text-[var(--vs-fg-muted)] text-[11px] leading-[1.35]">
+                              {formatOptions(r.options)}
+                            </td>
+                            <td className="px-2 py-[4px] align-top text-[var(--vs-fg)] truncate max-w-[220px]">
                               {String(r.answer ?? "")}
                             </td>
                           </tr>
@@ -642,6 +648,21 @@ export function SupplementView() {
       </div>
     </div>
   );
+}
+
+function formatOptions(options: unknown): string {
+  if (!options || typeof options !== "object") return "—";
+  const dict = options as Record<string, unknown>;
+  const keys = ["A", "B", "C", "D"];
+  const rows = keys
+    .map((k) => {
+      const v = dict[k];
+      if (v === undefined || v === null) return "";
+      const text = String(v).trim();
+      return text ? `${k}. ${text}` : "";
+    })
+    .filter(Boolean);
+  return rows.length ? rows.join(" | ") : "—";
 }
 
 function DetailChip({

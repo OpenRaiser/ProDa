@@ -256,8 +256,14 @@ export const useSession = create<SessionState>()(
       activeTrainingSession: null,
       setActiveTrainingSession: (s) => {
         const prev = get().activeTrainingSession;
-        // Reset transient state when switching sessions
-        if (!s || !prev || prev.session_id !== s.session_id) {
+        // Keep logs/metrics when session becomes inactive (s=null) so users can
+        // still inspect the just-finished run.
+        if (!s) {
+          set({ activeTrainingSession: null });
+          return;
+        }
+        // Reset transient state only when switching to a different session id.
+        if (!prev || prev.session_id !== s.session_id) {
           set({
             activeTrainingSession: s,
             trainingLogs: [],
@@ -290,7 +296,12 @@ export const useSession = create<SessionState>()(
       activeEvalSession: null,
       setActiveEvalSession: (s) => {
         const prev = get().activeEvalSession;
-        if (!s || !prev || prev.run_id !== s.run_id) {
+        // Keep eval logs when run becomes inactive (s=null) for post-run review.
+        if (!s) {
+          set({ activeEvalSession: null });
+          return;
+        }
+        if (!prev || prev.run_id !== s.run_id) {
           set({ activeEvalSession: s, evalLogs: [] });
         } else {
           set({ activeEvalSession: s });

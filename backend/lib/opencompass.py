@@ -255,6 +255,46 @@ def _load_json_safe(path: Path, default: Any) -> Any:
         return default
 
 
+def _pick_text(value: Any) -> str:
+    if isinstance(value, list):
+        for v in value:
+            s = str(v).strip()
+            if s:
+                return s
+        return ""
+    if isinstance(value, dict):
+        for k in ["text", "answer", "prediction", "pred", "content"]:
+            s = str(value.get(k, "")).strip()
+            if s:
+                return s
+        return str(value).strip()
+    return str(value or "").strip()
+
+
+def _normalize_answer(text: Any) -> str:
+    s = str(text or "").strip().upper().replace("，", ",")
+    parts = [p.strip() for p in s.split(",") if p.strip()]
+    if len(parts) > 1:
+        return ",".join(sorted(parts))
+    return parts[0] if parts else s
+
+
+def _infer_qtype(row: Dict[str, Any], gold: str) -> str:
+    qtype = str(row.get("question_type", "")).strip()
+    if qtype:
+        return qtype
+    options = row.get("options", {})
+    if not options:
+        return "qa"
+    if isinstance(options, dict) and len(options) == 2:
+        a = str(options.get("A", "")).strip().lower()
+        b = str(options.get("B", "")).strip().lower()
+        if a in {"true", "correct"} and b in {"false", "incorrect"}:
+            return "true_false"
+    ans = _normalize_answer(gold)
+    return "multiple_choice" if "," in ans else "single_choice"
+
+
 def collect_samples(
     run_dir: Path,
     benchmark_rows: List[Dict[str, Any]],
@@ -305,26 +345,40 @@ def collect_samples(
             if not isinstance(entry, dict):
                 continue
             row = benchmark_rows[idx] if 0 <= idx < len(benchmark_rows) else {}
-            prediction = str(entry.get("pred") or entry.get("prediction") or "")
-            gold = str(entry.get("gold") or entry.get("answers") or row.get("answer") or "")
+            prediction = _pick_text(
+                entry.get("predictions")
+                or entry.get("prediction")
+                or entry.get("pred")
+                or entry.get("origin_prediction")
+                or ""
+            )
+            gold = _pick_text(
+                entry.get("references")
+                or entry.get("reference")
+                or entry.get("gold")
+                or entry.get("answers")
+                or row.get("answer")
+                or ""
+            )
             is_correct = entry.get("correct")
             if is_correct is None:
                 # Best-effort accuracy check
-                norm = lambda s: re.sub(r"[^A-Za-z]", "", str(s or "")).upper()
-                is_correct = bool(prediction and norm(prediction) == norm(gold))
+                is_correct = bool(prediction and _normalize_answer(prediction) == _normalize_answer(gold))
+            question = str(entry.get("question") or row.get("question") or "")
+            options = entry.get("options") or row.get("options") or {}
             out.append(
                 {
                     "model": abbr,
                     "idx": idx,
                     "sample_id": str(row.get("sample_id") or idx),
-                    "question": str(row.get("question", "")),
-                    "options": row.get("options") or {},
+                    "question": question,
+                    "options": options if isinstance(options, (dict, list)) else {},
                     "gold": gold,
                     "prediction": prediction,
                     "pass": bool(is_correct),
                     "subject": str(row.get("domain_context") or row.get("subject") or ""),
                     "process_name": str(row.get("process_name", "")),
-                    "question_type": str(row.get("question_type", "")),
+                    "question_type": _infer_qtype(row, gold),
                     "knowledge_node": str(
                         row.get("knowledge_node") or row.get("chain_id") or ""
                     ),

@@ -60,6 +60,105 @@ def _read_json(path: Path, default: Any) -> Any:
         return default
 
 
+def _summary_dataset_names(eval_payload: Dict[str, Any]) -> List[str]:
+    names: List[str] = []
+    result = eval_payload.get("result", {}) or {}
+    summary_data = result.get("summary_data", [])
+    if isinstance(summary_data, list):
+        for row in summary_data:
+            if not isinstance(row, dict):
+                continue
+            ds = str(row.get("dataset", "")).strip()
+            if ds and ds not in names:
+                names.append(ds)
+    if "proda_bench" not in names:
+        names.append("proda_bench")
+    return names
+
+
+def _candidate_run_dirs(eval_payload: Dict[str, Any]) -> List[Path]:
+    result = eval_payload.get("result", {}) or {}
+    out: List[Path] = []
+
+    def _push(p: Path) -> None:
+        try:
+            rp = p.resolve()
+        except Exception:
+            rp = p
+        if rp.exists() and rp.is_dir() and rp not in out:
+            out.append(rp)
+
+    # Legacy payloads have explicit run_dir
+    run_dir = Path(str(result.get("run_dir", "")).strip())
+    if str(run_dir).strip():
+        _push(run_dir)
+
+    # New payloads may only have summary_file + work_dir
+    summary_file = Path(str(result.get("summary_file", "")).strip())
+    if str(summary_file).strip() and summary_file.exists():
+        # .../<run_dir>/summary/summary_xxx.csv -> parent.parent is run_dir
+        _push(summary_file.parent.parent)
+
+    work_dir = Path(str(eval_payload.get("work_dir", "")).strip())
+    if str(work_dir).strip() and work_dir.exists() and work_dir.is_dir():
+        # OpenCompass run artifacts are usually nested one level below work_dir
+        # in timestamped folders that contain `results/` and `summary/`.
+        for child in sorted(work_dir.iterdir()):
+            if child.is_dir() and (child / "results").exists():
+                _push(child)
+        _push(work_dir)
+
+    return out
+
+
+def _resolve_model_result_path(eval_payload: Dict[str, Any], model_abbr: str) -> Optional[Path]:
+    datasets = _summary_dataset_names(eval_payload)
+    for run_dir in _candidate_run_dirs(eval_payload):
+        for ds in datasets:
+            p = run_dir / "results" / str(model_abbr) / f"{ds}.json"
+            if p.exists():
+                return p
+    return None
+
+
+def _pick_text(value: Any) -> str:
+    if isinstance(value, list):
+        for v in value:
+            s = str(v).strip()
+            if s:
+                return s
+        return ""
+    if isinstance(value, dict):
+        for k in ["text", "answer", "prediction", "pred", "content"]:
+            s = str(value.get(k, "")).strip()
+            if s:
+                return s
+        return str(value).strip()
+    return str(value or "").strip()
+
+
+def _summary_accuracy_hint(eval_payload: Dict[str, Any], model_abbr: str) -> Optional[float]:
+    result = eval_payload.get("result", {}) or {}
+    summary_data = result.get("summary_data", [])
+    if not isinstance(summary_data, list):
+        return None
+    for row in summary_data:
+        if not isinstance(row, dict):
+            continue
+        raw = row.get(model_abbr)
+        if raw is None:
+            continue
+        try:
+            val = float(str(raw).strip())
+        except Exception:
+            continue
+        # summary_data stores percentage (e.g., 80.00), normalize to 0~1
+        if val > 1:
+            val = val / 100.0
+        return val
+    return None
+
+
 def normalize_answer(text: Any) -> str:
     if text is None:
         return ""
@@ -121,9 +220,9 @@ def _build_error_samples(
         if q:
             question_map[q] = item
 
-    result = eval_payload.get("result", {}) or {}
-    run_dir = Path(str(result.get("run_dir", "")))
-    model_result_path = run_dir / "results" / str(model_abbr) / "proda_bench.json"
+    model_result_path = _resolve_model_result_path(eval_payload, model_abbr)
+    if model_result_path is None:
+        model_result_path = Path()
     model_result = _read_json(model_result_path, {})
     details = model_result.get("details", {}) if isinstance(model_result, dict) else {}
     if not isinstance(details, dict):
@@ -143,10 +242,6 @@ def _build_error_samples(
         if idx_key == "type" or not isinstance(entry, dict):
             continue
 
-        question = str(entry.get("question", "")).strip()
-        if not question:
-            continue
-
         try:
             idx = int(idx_key)
         except Exception:
@@ -155,11 +250,30 @@ def _build_error_samples(
         bench_info: Dict[str, Any] = {}
         if 0 <= idx < len(benchmark_data) and isinstance(benchmark_data[idx], dict):
             bench_info = benchmark_data[idx]
-        if not bench_info:
+        question = str(entry.get("question", "")).strip()
+        if not bench_info and question:
+            # Older payloads can still recover benchmark rows via question text.
             bench_info = question_map.get(question, {})
+        if not question:
+            question = str(bench_info.get("question", "")).strip()
+        if not question:
+            continue
 
-        prediction = entry.get("predictions") or entry.get("prediction") or entry.get("origin_prediction", "")
-        reference = entry.get("references") or entry.get("reference") or entry.get("gold", bench_info.get("answer", ""))
+        prediction = _pick_text(
+            entry.get("predictions")
+            or entry.get("prediction")
+            or entry.get("pred")
+            or entry.get("origin_prediction")
+            or entry.get("output")
+            or ""
+        )
+        reference = _pick_text(
+            entry.get("references")
+            or entry.get("reference")
+            or entry.get("gold")
+            or entry.get("answers")
+            or bench_info.get("answer", "")
+        )
         pred_norm = normalize_answer(prediction)
         ref_norm = normalize_answer(reference)
 
@@ -168,7 +282,11 @@ def _build_error_samples(
 
         subject_total[subject] += 1
         total_samples += 1
-        is_correct = bool(pred_norm and ref_norm and pred_norm == ref_norm)
+        correct_flag = entry.get("correct")
+        if isinstance(correct_flag, bool):
+            is_correct = correct_flag
+        else:
+            is_correct = bool(pred_norm and ref_norm and pred_norm == ref_norm)
         if is_correct:
             total_correct += 1
             subject_correct[subject] += 1
@@ -213,7 +331,7 @@ def _build_error_samples(
         "total_samples": int(total_samples),
         "correct_samples": int(total_correct),
         "accuracy": round(float(accuracy), 4),
-        "result_path": str(model_result_path),
+        "result_path": str(model_result_path) if str(model_result_path) else "",
     }
 
 
@@ -305,6 +423,19 @@ def generate_diagnostic_report(
     prompt_template = _load_prompt()
     base = _build_error_samples(eval_payload, target_model_abbr)
     error_samples = list(base.get("error_samples", []))
+    if int(base.get("total_samples", 0)) <= 0:
+        hint = _summary_accuracy_hint(eval_payload, target_model_abbr)
+        hint_text = (
+            f" Summary accuracy hint={hint*100:.2f}%."
+            if hint is not None
+            else ""
+        )
+        raise ValueError(
+            "No sample-level OpenCompass details found for diagnosis."
+            f" model={target_model_abbr}."
+            " Please ensure run artifacts keep `results/<model>/<dataset>.json`."
+            + hint_text
+        )
 
     samples_to_diagnose = error_samples if int(max_diagnose) == 0 else error_samples[: int(max_diagnose)]
     total = len(samples_to_diagnose)

@@ -446,6 +446,11 @@ def _run_supplement(
         report = _load_json(report_path, {})
         if not isinstance(report, dict) or not report:
             raise RuntimeError("Diagnostic report is empty")
+        if int(report.get("total_samples", 0) or 0) <= 0:
+            raise RuntimeError(
+                "Diagnostic report has zero evaluated samples. "
+                "Please regenerate the report from a valid OpenCompass run result."
+            )
 
         def on_progress(done: int, total: int) -> None:
             t = max(1, int(total))

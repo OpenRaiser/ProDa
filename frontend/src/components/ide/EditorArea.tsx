@@ -8,15 +8,17 @@ import { FineTune } from "@/pages/FineTune";
 import { FineTuning } from "@/pages/FineTuning";
 import { OpenCompass } from "@/pages/OpenCompass";
 import { Results } from "@/pages/Results";
+import { useI18n } from "@/hooks/useI18n";
 
 export function EditorArea() {
+  const { t } = useI18n();
   const tabs = useSession((s) => s.openTabs);
   const activeTabId = useSession((s) => s.activeTabId);
   const active = tabs.find((t) => t.id === activeTabId);
   if (!active) {
     return (
       <div className="h-full w-full flex items-center justify-center text-[var(--vs-fg-subtle)] text-[13px]">
-        No active tab
+        {t("editor.no_active_tab")}
       </div>
     );
   }

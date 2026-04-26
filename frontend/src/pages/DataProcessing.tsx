@@ -799,7 +799,7 @@ function ExportView({ core }: { core: KnowledgeCore }) {
       </button>
       <div className="flex items-center gap-2 text-[11px] text-[var(--vs-fg-muted)]">
         <FileJson size={12} />
-        <span>Preview (read-only)</span>
+        <span>{t("dp.preview_readonly")}</span>
       </div>
       <pre className="vs-card p-4 font-mono text-[12px] leading-[1.6] text-[var(--vs-fg)] overflow-auto max-h-[420px] whitespace-pre">
 {jsonStr}

@@ -337,11 +337,21 @@ def _resolve_dataset_rows(project_id: str, req: TrainConfig) -> List[Dict[str, A
     raise HTTPException(status_code=400, detail=f"unknown dataset_source: {req.dataset_source}")
 
 
-def _build_yaml_payload(project_id: str, req: TrainConfig) -> Dict[str, Any]:
+def _build_yaml_payload(
+    project_id: str,
+    req: TrainConfig,
+    run_suffix: str = "",
+) -> Dict[str, Any]:
     template = req.template.strip() or lf.infer_template(req.model_path)
     model_tag = Path(req.model_path).name or "model"
     dataset_tag = req.dataset_name.strip() or "dataset"
-    output_dir = _outputs_root(project_id) / f"{dataset_tag}_{model_tag}"
+    base_name = f"{dataset_tag}_{model_tag}"
+    output_name = (
+        f"{base_name}_{_sanitize_tag(run_suffix, fallback='run')}"
+        if str(run_suffix).strip()
+        else base_name
+    )
+    output_dir = _outputs_root(project_id) / output_name
     yaml_text = lf.build_train_yaml(
         {
             "model_path": req.model_path,
@@ -438,14 +448,15 @@ def start_training(project_id: str, body: StartTrainingRequest) -> Dict[str, Any
         _save_json(dataset_info_path, existing)
 
         # Build YAML (use override if provided)
-        payload = _build_yaml_payload(project_id, body.config)
+        run_suffix = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+        payload = _build_yaml_payload(project_id, body.config, run_suffix=run_suffix)
         yaml_text = body.yaml_override.strip() or payload["yaml"]
         output_dir = Path(payload["output_dir"])
         output_dir.mkdir(parents=True, exist_ok=True)
 
         cfg_dir = _configs_dir(project_id)
         cfg_dir.mkdir(parents=True, exist_ok=True)
-        cfg_path = cfg_dir / f"{payload['dataset_tag']}_{payload['model_tag']}.yaml"
+        cfg_path = cfg_dir / f"{payload['dataset_tag']}_{payload['model_tag']}_{run_suffix}.yaml"
         cfg_path.write_text(yaml_text, encoding="utf-8")
 
         log_dir = _logs_dir(project_id)
