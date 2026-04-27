@@ -154,8 +154,6 @@ Second-Round Iteration
 
 ## 🖼️ 效果展示
 
-> 下面这些位置你后续补截图即可，我先把结构留好。
-
 <table>
   <tr>
     <td align="center" width="50%">
