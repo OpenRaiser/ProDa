@@ -1,8 +1,6 @@
 <div align="center">
 
-<img src="https://github.com/user-attachments/assets/91bdab9a-cc76-49b7-a6e6-c86271816602" alt="ProDA Logo" width="320" />
-
-# ProDA
+<img src="https://github.com/user-attachments/assets/7f579d02-acc3-492e-9b24-ad508eb8cfa2" alt="ProDA Logo" width="320" />
 
 **面向垂直领域的 AI 数据构建与模型迭代工作台**  
 **从原始文档到 Benchmark / SFT / 微调 / 评测 / 诊断补数据，一站式闭环完成。**
@@ -30,7 +28,7 @@
 
 ---
 
-> ProDA 不是一个“数据生成脚本集合”，而是一个真正面向模型迭代的 **VSCode 风格 Web IDE**。  
+> ProDa 不是一个“数据生成脚本集合”，而是一个真正面向模型迭代的 **VSCode 风格 Web IDE**。  
 > 集成文档解析、知识抽取、Benchmark 构建、SFT 数据生成、LLaMA-Factory 微调、OpenCompass 评测、错误诊断与二轮数据补强串成一个可追溯的项目工作流。
 
 ```text
@@ -53,7 +51,7 @@ Second-Round Iteration
 
 ## 📖 目录
 
-- [🚀 为什么你会想试试 ProDA](#-为什么你会想试试-proda)
+- [🚀 为什么你会想试试 ProDa](#-为什么你会想试试-proda)
 - [🖼️ 效果展示](#️-效果展示占位待你补图)
 - [✨ 你会得到什么](#-你会得到什么)
 - [📦 快速开始](#-快速开始5-分钟起步)
@@ -70,7 +68,7 @@ Second-Round Iteration
 
 ---
 
-## 🚀 为什么你会想试试 ProDA
+## 🚀 为什么你会想试试 ProDa
 
 你可能经历过这些痛点：
 
@@ -343,16 +341,16 @@ ProDA/
 
 ## 🙏 致谢
 
-ProDA 的实现离不开这些优秀项目与生态：
+ProDa 的实现离不开这些优秀项目与生态：
 
 - [LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory) — 高效微调训练框架
 - [OpenCompass](https://github.com/open-compass/opencompass) — 大模型评测体系
 - [FastAPI](https://fastapi.tiangolo.com/) — 后端 API 服务
 - [React](https://react.dev/) / [Vite](https://vitejs.dev/) — 前端交互与工程化
-- VSCode / Cursor — ProDA IDE 风格的重要灵感来源
+- VSCode / Cursor — ProDa IDE 风格的重要灵感来源
 
 也感谢所有真实业务场景中的反馈者：  
-ProDA 的目标不是做一个玩具 Demo，而是持续靠近“能真正支撑领域模型迭代”的工作台。
+ProDa 的目标不是做一个玩具 Demo，而是持续靠近“能真正支撑领域模型迭代”的工作台。
 
 ---
 
@@ -364,15 +362,15 @@ ProDA 的目标不是做一个玩具 Demo，而是持续靠近“能真正支撑
   <picture>
     <source
       media="(prefers-color-scheme: dark)"
-      srcset="https://api.star-history.com/svg?repos=https://github.com/OpenRaiser/ProDa-dev&type=Date&theme=dark"
+      srcset="https://api.star-history.com/svg?repos=https://github.com/OpenRaiser/ProDa&type=Date&theme=dark"
     />
     <source
       media="(prefers-color-scheme: light)"
-      srcset="https://api.star-history.com/svg?repos=https://github.com/OpenRaiser/ProDa-dev&type=Date"
+      srcset="https://api.star-history.com/svg?repos=https://github.com/OpenRaiser/ProDa&type=Date"
     />
     <img
       alt="Star History Chart"
-      src="https://api.star-history.com/svg?repos=https://github.com/OpenRaiser/ProDa-dev&type=Date"
+      src="https://api.star-history.com/svg?repos=https://github.com/OpenRaiser/ProDa&type=Date"
     />
   </picture>
 </p>
@@ -381,7 +379,7 @@ ProDA 的目标不是做一个玩具 Demo，而是持续靠近“能真正支撑
 
 ## 🤝 贡献与交流
 
-欢迎提 Issue / PR 一起完善 ProDA。
+欢迎提 Issue / PR 一起完善 ProDa。
 
 你可以从这些方向参与：
 
@@ -408,7 +406,7 @@ MIT
 
 <div align="center">
 
-**ProDA 仅供教育、研究与技术交流使用。**
+**ProDa 仅供教育、研究与技术交流使用。**
 
 如果你觉得这个项目有意思，欢迎 Star / Fork / 试跑一遍完整闭环。
 
