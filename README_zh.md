@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="https://github.com/user-attachments/assets/91bdab9a-cc76-49b7-a6e6-c86271816602" alt="ProDA Logo" width="320" />
+
 # ProDA
 
 **面向垂直领域的 AI 数据构建与模型迭代工作台**  
@@ -156,25 +158,34 @@ Second-Round Iteration
 
 > 下面这些位置你后续补截图即可，我先把结构留好。
 
-### 🖥️ IDE 总览
-
-![ProDA IDE 总览](https://github.com/user-attachments/assets/e3ee2d59-0cff-488a-be53-be07c687f080)
-
-### 📚 文档抽取与知识核心
-
-![Step1](https://github.com/user-attachments/assets/edb7d205-4a0e-471f-bcc3-d15ab8e88e57)
-
-### 📈 微调与训练曲线
-
-![Step5](https://github.com/user-attachments/assets/7511eb54-36e2-46ad-b21c-af8eae1f5819)
-
-### 🏆 OpenCompass 结果看板
-
-![Step6](https://github.com/user-attachments/assets/45dce8f6-1526-4f04-86d9-db9a43880394)
-
-### 💬 模型对话验证窗口
-
-![FineTuning Chat](https://github.com/user-attachments/assets/c659ec73-6723-4f6f-b67a-2a409f996df6)
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <strong>🖥️ IDE 总览</strong><br />
+      <img src="https://github.com/user-attachments/assets/e3ee2d59-0cff-488a-be53-be07c687f080" alt="ProDA IDE 总览" width="100%" height="280" />
+    </td>
+    <td align="center" width="50%">
+      <strong>📚 文档抽取与知识核心</strong><br />
+      <img src="https://github.com/user-attachments/assets/edb7d205-4a0e-471f-bcc3-d15ab8e88e57" alt="文档抽取与知识核心" width="100%" height="280" />
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <strong>📈 微调与训练曲线</strong><br />
+      <img src="https://github.com/user-attachments/assets/7511eb54-36e2-46ad-b21c-af8eae1f5819" alt="微调与训练曲线" width="100%" height="280" />
+    </td>
+    <td align="center" width="50%">
+      <strong>🏆 OpenCompass 结果看板</strong><br />
+      <img src="https://github.com/user-attachments/assets/45dce8f6-1526-4f04-86d9-db9a43880394" alt="OpenCompass 结果看板" width="100%" height="280" />
+    </td>
+  </tr>
+  <tr>
+    <td align="center" colspan="2">
+      <strong>💬 模型对话验证窗口</strong><br />
+      <img src="https://github.com/user-attachments/assets/c659ec73-6723-4f6f-b67a-2a409f996df6" alt="模型对话验证窗口" width="80%" height="280" />
+    </td>
+  </tr>
+</table>
 
 ---
 
@@ -330,26 +341,6 @@ ProDA/
 
 ---
 
-## 🎯 未来任务
-
-- [x] VSCode 风格 React + FastAPI 工作台
-- [x] 项目制数据与产物管理
-- [x] 文档到知识核心抽取
-- [x] Benchmark 自动生成与断点续跑
-- [x] FineTune / SFT 数据生成
-- [x] LLaMA-Factory 本地微调接入
-- [x] OpenCompass 评测与结果看板
-- [x] 诊断报告、补数据与二轮训练闭环
-- [x] 微调模型 / Checkpoint 流式对话验证
-- [ ] 更多格式原始数据的支持（Json等）
-- [ ] 更完整的数据集管理页
-- [ ] 更丰富的诊断报告可视化
-- [ ] 训练配置模板与最佳实践预设
-- [ ] 集群部署与 SLURM 使用说明
-- [ ] 更多 Demo、截图与教程
-
----
-
 ## 🙏 致谢
 
 ProDA 的实现离不开这些优秀项目与生态：
@@ -407,16 +398,7 @@ ProDA 的目标不是做一个玩具 Demo，而是持续靠近“能真正支撑
 
 ## 📝 引用
 
-如果 ProDA 对你的研究或项目有帮助，可以使用下面格式引用：
-
-```bibtex
-@software{proda2026,
-  title = {ProDA: A VSCode-style Workbench for Domain Data Construction and Model Iteration},
-  author = {ProDA Contributors},
-  year = {2026},
-  url = {https://github.com/your-github-name/ProDA}
-}
-```
+TBD
 
 ---
 

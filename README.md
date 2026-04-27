@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="https://github.com/user-attachments/assets/91bdab9a-cc76-49b7-a6e6-c86271816602" alt="ProDA Logo" width="320" />
+
 # ProDA
 
 **An AI data-construction and model-iteration workbench for vertical domains**  
@@ -157,25 +159,34 @@ You may have run into these problems:
 
 > Screenshot slots are kept intentionally. Add real images later without changing the README structure.
 
-### 🖥️ IDE Overview
-
-![ProDA IDE Overview](https://github.com/user-attachments/assets/e3ee2d59-0cff-488a-be53-be07c687f080)
-
-### 📚 Document Extraction and Knowledge Core
-
-![Step1](https://github.com/user-attachments/assets/edb7d205-4a0e-471f-bcc3-d15ab8e88e57)
-
-### 📈 Fine-Tuning and Training Curves
-
-![Step5](https://github.com/user-attachments/assets/7511eb54-36e2-46ad-b21c-af8eae1f5819)
-
-### 🏆 OpenCompass Result Dashboard
-
-![Step6](https://github.com/user-attachments/assets/45dce8f6-1526-4f04-86d9-db9a43880394)
-
-### 💬 Model Chat Verification
-
-![FineTuning Chat](https://github.com/user-attachments/assets/c659ec73-6723-4f6f-b67a-2a409f996df6)
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <strong>🖥️ IDE Overview</strong><br />
+      <img src="https://github.com/user-attachments/assets/e3ee2d59-0cff-488a-be53-be07c687f080" alt="ProDA IDE Overview" width="100%" height="280" />
+    </td>
+    <td align="center" width="50%">
+      <strong>📚 Document Extraction and Knowledge Core</strong><br />
+      <img src="https://github.com/user-attachments/assets/edb7d205-4a0e-471f-bcc3-d15ab8e88e57" alt="Document Extraction and Knowledge Core" width="100%" height="280" />
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <strong>📈 Fine-Tuning and Training Curves</strong><br />
+      <img src="https://github.com/user-attachments/assets/7511eb54-36e2-46ad-b21c-af8eae1f5819" alt="Fine-Tuning and Training Curves" width="100%" height="280" />
+    </td>
+    <td align="center" width="50%">
+      <strong>🏆 OpenCompass Result Dashboard</strong><br />
+      <img src="https://github.com/user-attachments/assets/45dce8f6-1526-4f04-86d9-db9a43880394" alt="OpenCompass Result Dashboard" width="100%" height="280" />
+    </td>
+  </tr>
+  <tr>
+    <td align="center" colspan="2">
+      <strong>💬 Model Chat Verification</strong><br />
+      <img src="https://github.com/user-attachments/assets/c659ec73-6723-4f6f-b67a-2a409f996df6" alt="FineTuning Chat" width="80%" height="280" />
+    </td>
+  </tr>
+</table>
 
 ---
 
@@ -332,26 +343,6 @@ The current version already covers the main loop from data construction to evalu
 
 ---
 
-## 🎯 Roadmap
-
-- [x] VSCode-style React + FastAPI workbench
-- [x] Project-based data and artifact management
-- [x] Document-to-knowledge-core extraction
-- [x] Benchmark generation with resume support
-- [x] FineTune / SFT data generation
-- [x] LLaMA-Factory local fine-tuning integration
-- [x] OpenCompass evaluation and result dashboards
-- [x] Diagnostic reports, supplement data, and second-round training loop
-- [x] Fine-tuned model / checkpoint streaming chat verification
-- [ ] Support for more raw-data formats such as JSON
-- [ ] More complete dataset management page
-- [ ] Richer diagnostic-report visualizations
-- [ ] Training configuration templates and best-practice presets
-- [ ] Cluster deployment and SLURM usage guide
-- [ ] More demos, screenshots, and tutorials
-
----
-
 ## 🙏 Acknowledgements
 
 ProDA is built on top of these excellent projects and ecosystems:
@@ -409,16 +400,7 @@ If you have a real-world scenario in education, healthcare, finance, industry, o
 
 ## 📝 Citation
 
-If ProDA is useful for your research or project, you can cite it as:
-
-```bibtex
-@software{proda2026,
-  title = {ProDA: A VSCode-style Workbench for Domain Data Construction and Model Iteration},
-  author = {ProDA Contributors},
-  year = {2026},
-  url = {https://github.com/OpenRaiser/ProDa-dev}
-}
-```
+TBD
 
 ---
 
