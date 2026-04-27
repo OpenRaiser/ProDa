@@ -154,7 +154,7 @@ Second-Round Iteration
 
 ---
 
-## 🖼️ 效果展示（占位，待你补图）
+## 🖼️ 效果展示
 
 > 下面这些位置你后续补截图即可，我先把结构留好。
 
@@ -162,27 +162,27 @@ Second-Round Iteration
   <tr>
     <td align="center" width="50%">
       <strong>🖥️ IDE 总览</strong><br />
-      <img src="https://github.com/user-attachments/assets/e3ee2d59-0cff-488a-be53-be07c687f080" alt="ProDA IDE 总览" width="100%" height="280" />
+      <img src="https://github.com/user-attachments/assets/57e7c482-abb5-495c-b3f1-7921788424bc" alt="ProDA IDE 总览" width="100%" height="280" />
     </td>
     <td align="center" width="50%">
       <strong>📚 文档抽取与知识核心</strong><br />
-      <img src="https://github.com/user-attachments/assets/edb7d205-4a0e-471f-bcc3-d15ab8e88e57" alt="文档抽取与知识核心" width="100%" height="280" />
+      <img src="https://github.com/user-attachments/assets/64ce9df4-be31-4906-87f1-a4020239914b" alt="文档抽取与知识核心" width="100%" height="280" />
     </td>
   </tr>
   <tr>
     <td align="center" width="50%">
       <strong>📈 微调与训练曲线</strong><br />
-      <img src="https://github.com/user-attachments/assets/7511eb54-36e2-46ad-b21c-af8eae1f5819" alt="微调与训练曲线" width="100%" height="280" />
+      <img src="https://github.com/user-attachments/assets/35c3222e-cab9-4622-9558-42d695a6a124" alt="微调与训练曲线" width="100%" height="280" />
     </td>
     <td align="center" width="50%">
       <strong>🏆 OpenCompass 结果看板</strong><br />
-      <img src="https://github.com/user-attachments/assets/45dce8f6-1526-4f04-86d9-db9a43880394" alt="OpenCompass 结果看板" width="100%" height="280" />
+      <img src="https://github.com/user-attachments/assets/82bda5cd-5eb8-4481-913b-0a5fa6f7163f" alt="OpenCompass 结果看板" width="100%" height="280" />
     </td>
   </tr>
   <tr>
     <td align="center" colspan="2">
       <strong>💬 模型对话验证窗口</strong><br />
-      <img src="https://github.com/user-attachments/assets/c659ec73-6723-4f6f-b67a-2a409f996df6" alt="模型对话验证窗口" width="80%" height="280" />
+      <img src="https://github.com/user-attachments/assets/64c167ba-c94a-4dc6-896b-fdd2a4ca13ba" alt="模型对话验证窗口" width="80%" height="280" />
     </td>
   </tr>
 </table>
