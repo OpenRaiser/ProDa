@@ -28,3 +28,8 @@ Thumbs.db
 .idea/
 
 Model/
+Model-mock/
+LLaMA-Factory-mock/
+opencompass-mock/
+QUICKSTART_IDE.md
+app.py
