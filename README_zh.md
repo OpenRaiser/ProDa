@@ -158,23 +158,23 @@ Second-Round Iteration
 
 ### 🖥️ IDE 总览
 
-![ProDA IDE 总览（待补）](./assets/readme/ide-overview.png)
+![ProDA IDE 总览](https://github.com/user-attachments/assets/e3ee2d59-0cff-488a-be53-be07c687f080)
 
 ### 📚 文档抽取与知识核心
 
-![Step1（待补）](./assets/readme/step1-extraction.png)
+![Step1](https://github.com/user-attachments/assets/edb7d205-4a0e-471f-bcc3-d15ab8e88e57)
 
 ### 📈 微调与训练曲线
 
-![Step5（待补）](./assets/readme/step5-train.png)
+![Step5](https://github.com/user-attachments/assets/7511eb54-36e2-46ad-b21c-af8eae1f5819)
 
 ### 🏆 OpenCompass 结果看板
 
-![Step6（待补）](./assets/readme/step6-opencompass.png)
+![Step6](https://github.com/user-attachments/assets/45dce8f6-1526-4f04-86d9-db9a43880394)
 
 ### 💬 模型对话验证窗口
 
-![FineTuning Chat（待补）](https://github.com/user-attachments/assets/c659ec73-6723-4f6f-b67a-2a409f996df6)
+![FineTuning Chat](https://github.com/user-attachments/assets/c659ec73-6723-4f6f-b67a-2a409f996df6)
 
 ---
 

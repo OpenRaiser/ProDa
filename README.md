@@ -159,23 +159,23 @@ You may have run into these problems:
 
 ### 🖥️ IDE Overview
 
-![ProDA IDE Overview (TODO)](./assets/readme/ide-overview.png)
+![ProDA IDE Overview](https://github.com/user-attachments/assets/e3ee2d59-0cff-488a-be53-be07c687f080)
 
 ### 📚 Document Extraction and Knowledge Core
 
-![Step1 (TODO)](./assets/readme/step1-extraction.png)
+![Step1](https://github.com/user-attachments/assets/edb7d205-4a0e-471f-bcc3-d15ab8e88e57)
 
 ### 📈 Fine-Tuning and Training Curves
 
-![Step5 (TODO)](./assets/readme/step5-train.png)
+![Step5](https://github.com/user-attachments/assets/7511eb54-36e2-46ad-b21c-af8eae1f5819)
 
 ### 🏆 OpenCompass Result Dashboard
 
-![Step6 (TODO)](./assets/readme/step6-opencompass.png)
+![Step6](https://github.com/user-attachments/assets/45dce8f6-1526-4f04-86d9-db9a43880394)
 
 ### 💬 Model Chat Verification
 
-![FineTuning Chat (TODO)](./assets/readme/step5-chat.png)
+![FineTuning Chat](https://github.com/user-attachments/assets/c659ec73-6723-4f6f-b67a-2a409f996df6)
 
 ---
 
