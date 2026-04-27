@@ -155,8 +155,6 @@ You may have run into these problems:
 
 ## 🖼️ Showcase
 
-> Screenshot slots are kept intentionally. Add real images later without changing the README structure.
-
 <table>
   <tr>
     <td align="center" width="50%">
