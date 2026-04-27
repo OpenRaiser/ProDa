@@ -7,6 +7,7 @@ import {
   FileCode2,
   FileText,
   Loader2,
+  MessageSquare,
   Play,
   RefreshCw,
   Settings2,
@@ -48,6 +49,7 @@ import type {
   TrainingConfig,
   TrainingSession,
 } from "@/types";
+import { ModelChatModal } from "@/pages/finetune/ModelChatModal";
 
 const DEFAULT_CONFIG: TrainingConfig = {
   dataset_source: "session",
@@ -109,6 +111,7 @@ export function FineTuning() {
   const [canceling, setCanceling] = useState(false);
 
   const [outputTree, setOutputTree] = useState<OutputTreeEntry[]>([]);
+  const [chatOpen, setChatOpen] = useState(false);
 
   const handleSelectHistory = useCallback(
     async (session: TrainingSession) => {
@@ -719,6 +722,19 @@ export function FineTuning() {
                 {t("ftune.cancel")}
               </button>
             )}
+            <button
+              className="vs-btn-secondary flex items-center gap-2"
+              onClick={() => setChatOpen(true)}
+              disabled={!history.some((h) => h.status === "finished")}
+              title={
+                history.some((h) => h.status === "finished")
+                  ? ""
+                  : t("ftune.chat_need_finished_run")
+              }
+            >
+              <MessageSquare size={13} />
+              {t("ftune.chat_open")}
+            </button>
             {launchError && (
               <span className="text-[12px] text-[#f48771] flex items-center gap-1">
                 <AlertCircle size={12} />
@@ -760,6 +776,11 @@ export function FineTuning() {
           </section>
         )}
       </div>
+      <ModelChatModal
+        projectId={project?.id}
+        open={chatOpen}
+        onClose={() => setChatOpen(false)}
+      />
     </div>
   );
 }
@@ -1086,6 +1107,7 @@ function MetricChart({
   dataKey: "loss" | "lr";
   color: string;
 }) {
+  const { t } = useI18n();
   return (
     <div>
       <div className="text-[11px] uppercase tracking-wider text-[var(--vs-fg-heading)] mb-2">
@@ -1093,7 +1115,7 @@ function MetricChart({
       </div>
       {data.length === 0 ? (
         <div className="h-[160px] flex items-center justify-center text-[11px] text-[var(--vs-fg-subtle)] italic">
-          no data yet
+          {t("ftune.chart_no_data")}
         </div>
       ) : (
         <div style={{ width: "100%", height: 160 }}>

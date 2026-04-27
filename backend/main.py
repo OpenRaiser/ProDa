@@ -16,6 +16,7 @@ from backend.api import (  # noqa: E402
     diagnosis,
     extraction,
     finetune,
+    finetune_chat,
     finetune_train,
     health,
     llm,
@@ -56,6 +57,7 @@ app.include_router(diagnosis.router, prefix="/api/diagnosis", tags=["diagnosis"]
 app.include_router(
     finetune_train.router, prefix="/api/finetune_train", tags=["finetune_train"]
 )
+app.include_router(finetune_chat.router, prefix="/api/finetune_chat", tags=["finetune_chat"])
 app.include_router(opencompass.router, prefix="/api/opencompass", tags=["opencompass"])
 app.include_router(dashboard.router, prefix="/api/dashboard", tags=["dashboard"])
 

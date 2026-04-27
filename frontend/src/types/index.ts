@@ -581,6 +581,59 @@ export interface StartTrainingResponse {
   active: TrainingSession;
 }
 
+export interface FineTuneChatCheckpoint {
+  name: string;
+  path: string;
+}
+
+export interface FineTuneChatCandidate {
+  session_id: string;
+  status: string;
+  started_at: number;
+  started_at_human: string;
+  dataset_name: string;
+  model_tag: string;
+  base_model_path: string;
+  finetuning_type: string;
+  output_dir: string;
+  default_target_path: string;
+  checkpoints: FineTuneChatCheckpoint[];
+  label: string;
+  is_loaded_default?: boolean;
+}
+
+export interface FineTuneChatLoadRequest {
+  session_id: string;
+  target_path: string;
+}
+
+export interface FineTuneChatLoadResponse {
+  ok: boolean;
+  already_loaded: boolean;
+  signature: string;
+  session_id: string;
+  target_path: string;
+  finetuning_type: string;
+}
+
+export interface FineTuneChatMessage {
+  role: "system" | "user" | "assistant";
+  content: string;
+}
+
+export interface FineTuneChatStreamRequest {
+  session_id: string;
+  target_path: string;
+  messages: FineTuneChatMessage[];
+  temperature: number;
+  top_p: number;
+  top_k: number;
+  max_new_tokens: number;
+  repetition_penalty: number;
+  max_history_turns?: number;
+  max_context_chars?: number;
+}
+
 // ========== Phase 6 — OpenCompass Evaluation ==========
 
 export interface EvalEnvCheck {
