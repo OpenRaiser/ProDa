@@ -4,8 +4,8 @@
 
 # ProDA
 
-**An AI data-construction and model-iteration workbench for vertical domains**  
-**From raw documents to Benchmark / SFT / fine-tuning / evaluation / diagnostic data augmentation, all in one loop.**
+**面向垂直领域的 AI 数据构建与模型迭代工作台**  
+**从原始文档到 Benchmark / SFT / 微调 / 评测 / 诊断补数据，一站式闭环完成。**
 
 <br />
 
@@ -20,18 +20,18 @@
 
 <br />
 
-**Quick Start** · **Showcase** · **Workflow** · **Core Features** · **Fine-Tuning** · **OpenCompass Evaluation** · **Diagnostic Iteration**
+**快速开始** · **效果展示** · **工作流** · **核心能力** · **模型微调** · **OpenCompass 评测** · **诊断迭代**
 
 <br />
 
-[中文](./README_zh.md) · 🌐 English
+🌐 中文 · [English](./README_en.md)
 
 </div>
 
 ---
 
-> ProDA is not just a collection of data-generation scripts. It is a **VSCode-style Web IDE** built for iterative model improvement.  
-> It integrates document parsing, knowledge extraction, Benchmark construction, SFT data generation, LLaMA-Factory fine-tuning, OpenCompass evaluation, error diagnosis, and second-round data augmentation into one traceable project workflow.
+> ProDA 不是一个“数据生成脚本集合”，而是一个真正面向模型迭代的 **VSCode 风格 Web IDE**。  
+> 集成文档解析、知识抽取、Benchmark 构建、SFT 数据生成、LLaMA-Factory 微调、OpenCompass 评测、错误诊断与二轮数据补强串成一个可追溯的项目工作流。
 
 ```text
 Document
@@ -51,148 +51,147 @@ Second-Round Iteration
 
 ---
 
-## 📖 Table of Contents
+## 📖 目录
 
-- [🚀 Why ProDA](#-why-proda)
-- [🖼️ Showcase](#️-showcase-placeholders-for-now)
-- [✨ What You Get](#-what-you-get)
-- [📦 Quick Start](#-quick-start-5-minute-setup)
-- [🔬 Recommended Workflow](#-recommended-workflow)
-- [🏗️ Project Structure](#️-project-structure-simplified)
-- [📂 Artifact Layout](#-artifact-layout)
-- [❓ FAQ](#-faq)
-- [🧭 Current Status](#-current-status)
-- [🎯 Roadmap](#-roadmap)
-- [🙏 Acknowledgements](#-acknowledgements)
+- [🚀 为什么你会想试试 ProDA](#-为什么你会想试试-proda)
+- [🖼️ 效果展示](#️-效果展示占位待你补图)
+- [✨ 你会得到什么](#-你会得到什么)
+- [📦 快速开始](#-快速开始5-分钟起步)
+- [🔬 工作流建议](#-工作流建议)
+- [🏗️ 项目结构](#️-项目结构简版)
+- [📂 产物落盘位置](#-产物落盘位置)
+- [❓ 常见问题](#-常见问题)
+- [🧭 当前状态](#-当前状态)
+- [🙏 致谢](#-致谢)
 - [⭐ Star History](#-star-history)
-- [🤝 Contributing](#-contributing)
-- [📝 Citation](#-citation)
+- [🤝 贡献与交流](#-贡献与交流)
+- [📝 引用](#-引用)
 - [📄 License](#-license)
 
 ---
 
-## 🚀 Why ProDA
+## 🚀 为什么你会想试试 ProDA
 
-You may have run into these problems:
+你可能经历过这些痛点：
 
-- You have many domain documents, but they are hard to turn into reliable training data.
-- Benchmark generation, SFT data construction, training, and evaluation are scattered across scripts.
-- After fine-tuning, a single score does not tell you what the model got wrong or how to improve it.
+- 原始领域文档很多，但很难稳定转成可训练数据
+- Benchmark 构建、SFT 生成、训练、评测分散在多套脚本里
+- 微调后只看一个总分，不知道模型到底错在哪、怎么修
 
-**ProDA turns the whole process into a visual, project-based, traceable loop.**
+**ProDA 的目标就是：把这一切收敛到一个可视化、项目化、可追溯的闭环。**
 
-| Traditional workflow | ProDA |
+| 传统方式 | ProDA |
 | --- | --- |
-| Multiple scripts glued together manually | One project workbench for the full pipeline |
-| Data, training logs, and eval outputs scattered around | All states and artifacts are automatically archived per project |
-| Only aggregate scores after evaluation | Sample-level results, error annotations, and diagnostic reports |
-| Second-round iteration depends on manual intuition | Error-driven supplement data and merged training sets |
-| Trained artifacts are hard to verify immediately | Chat directly with a model / checkpoint using streaming output |
+| 多个脚本手动串联 | 一个项目工作台贯穿全流程 |
+| 数据、训练、评测产物分散 | 每个项目自动归档所有状态和产物 |
+| 微调评测后只看总分 | 支持样本级结果、错误标注和诊断报告 |
+| 二轮迭代依赖人工经验 | 基于错因生成补数据并合并训练集 |
+| 训练产物难以即时验证 | 可直接选择模型 / checkpoint 流式对话 |
 
 ---
 
-## ✨ What You Get
+## ✨ 你会得到什么
 
-| Module | What you can do | Output |
+| 模块 | 你可以做什么 | 产物 |
 | --- | --- | --- |
-| Document Processing | Upload domain documents and extract knowledge cores | `L1 / L2 / L3` knowledge structures |
-| Benchmark | Generate evaluable questions from reasoning chains | MCQ Benchmark |
-| SFT Data | Generate training data with configurable question-type ratios | FineTune / ShareGPT data |
-| Fine-Tuning | Train models through LLaMA-Factory | Checkpoints / LoRA artifacts |
-| Model Chat | Chat with historical models or checkpoints | Streaming replies and parameter validation |
-| OpenCompass | Evaluate local/API models | Leaderboard, comparison charts, sample details |
-| Diagnostic Supplement | Analyze error samples and generate targeted data | Diagnostic reports and second-round training sets |
+| 文档处理 | 上传领域文档并抽取知识核心 | `L1 / L2 / L3` 知识结构 |
+| Benchmark | 从推理链生成可评测题目 | MCQ Benchmark |
+| SFT 数据 | 按题型比例生成训练数据 | FineTune / ShareGPT 数据 |
+| 模型微调 | 调用 LLaMA-Factory 训练模型 | Checkpoint / LoRA 产物 |
+| 模型对话 | 选择历史模型或 checkpoint 直接试聊 | 流式回答与参数验证 |
+| OpenCompass | 评测本地模型/API模型 | 排行榜、对比图、样本明细 |
+| 诊断补数据 | 分析错误样本并生成补强数据 | 诊断报告、二轮训练集 |
 
 ---
 
-### 🗂️ 1) Project-Based Workspace
+### 🗂️ 1) 项目制工作空间（每个项目独立隔离）
 
-- Create, switch, and delete projects
-- Automatically archive project states and artifacts
-- Review historical training and evaluation runs
+- 项目创建 / 切换 / 删除
+- 项目状态和产物自动归档
+- 历史训练与评测可回看
 
-### 📄 2) Document-to-Knowledge-Core Extraction (Step1)
+### 📄 2) 文档到知识核心（Step1）
 
-- Supports `pdf` / `txt` / `md` / `docx`
-- Extracts three-level knowledge representation: `L1 concepts` / `L2 statements` / `L3 reasoning chains`
-- Supports chunking, parallel extraction, editable tables, and export
+- 支持 `pdf` / `txt` / `md` / `docx`
+- 抽取三层知识表示：`L1 concepts` / `L2 statements` / `L3 reasoning chains`
+- 支持分块策略、并发提取、结果编辑导出
 
-### 🧪 3) Benchmark Generation (Step2)
+### 🧪 3) Benchmark 生成（Step2）
 
-- Automatically generates multiple-choice Benchmark data from L3 reasoning chains
-- Supports concurrency, retries, cancellation, resume, preview, and editing
+- 基于 L3 链路自动生成选择题 Benchmark
+- 支持并发、重试、中断、续跑、结果预览与编辑
 
-### 🧬 4) FineTune Data Generation (Step3)
+### 🧬 4) FineTune 数据生成（Step3）
 
-- Controls QA / single-choice / multiple-choice / true-false ratios
-- Supports sampling windows, constraints, and history review
+- QA / 单选 / 多选 / 判断题比例控制
+- 支持采样窗口、约束参数、历史回看
 
-### 🩺 5) Diagnostic Reports + Supplement Data (Step3 Subflow)
+### 🩺 5) 诊断报告 + 补数据（Step3 子流程）
 
-- Generates structured diagnostic reports from OpenCompass error samples
-- Produces targeted supplement data based on issue types
-- Merges supplement data with original data for second-round training
+- 从 OpenCompass 错误样本生成结构化诊断报告
+- 按错因生成诊断补数据
+- 与原始数据合并形成二轮训练集
 
-### 🔥 6) Local Fine-Tuning (Step5)
+### 🔥 6) 本地微调（Step5）
 
-- Integrates with LLaMA-Factory
-- Visual training-parameter configuration
-- Live logs and Loss / LR curves
-- Training history and output directory management
-- Streaming chat verification for trained models / checkpoints
+- 对接 LLaMA-Factory
+- 训练参数可视化配置
+- 实时日志 / Loss & LR 曲线
+- 训练历史与输出目录管理
+- 直接对已训练模型/Checkpoint进行流式对话验证
 
-### 📊 7) OpenCompass Evaluation (Step6)
+### 📊 7) OpenCompass 评测（Step6）
 
-- Supports both local models and API models
-- Auto-detects LoRA / PEFT paths
-- Result views: Leaderboard / Comparison / Samples
-- Sample-level error annotation connected to diagnosis
+- 支持本地模型和 API 模型
+- 支持 LoRA / PEFT 自动识别
+- 结果看板：Leaderboard / Comparison / Samples
+- 样本级错误标注与诊断联动
 
-### 🧭 8) Result Center (Step7)
+### 🧭 8) 结果中心（Step7）
 
-- Unified view of key project artifacts and activity timeline
-- Easier export and review
+- 统一查看项目关键产物与活动时间线
+- 导出与复盘更直接
 
 ---
 
-## 🖼️ Showcase
+## 🖼️ 效果展示
 
-> Screenshot slots are kept intentionally. Add real images later without changing the README structure.
+> 下面这些位置你后续补截图即可，我先把结构留好。
 
 <table>
   <tr>
     <td align="center" width="50%">
-      <strong>🖥️ IDE Overview</strong><br />
-      <img src="https://github.com/user-attachments/assets/57e7c482-abb5-495c-b3f1-7921788424bc" alt="ProDA IDE Overview" width="100%" height="280" />
+      <strong>🖥️ IDE 总览</strong><br />
+      <img src="https://github.com/user-attachments/assets/57e7c482-abb5-495c-b3f1-7921788424bc" alt="ProDA IDE 总览" width="100%" height="280" />
     </td>
     <td align="center" width="50%">
-      <strong>📚 Document Extraction and Knowledge Core</strong><br />
-      <img src="https://github.com/user-attachments/assets/64ce9df4-be31-4906-87f1-a4020239914b" alt="Document Extraction and Knowledge Core" width="100%" height="280" />
+      <strong>📚 文档抽取与知识核心</strong><br />
+      <img src="https://github.com/user-attachments/assets/64ce9df4-be31-4906-87f1-a4020239914b" alt="文档抽取与知识核心" width="100%" height="280" />
     </td>
   </tr>
   <tr>
     <td align="center" width="50%">
-      <strong>📈 Fine-Tuning and Training Curves</strong><br />
-      <img src="https://github.com/user-attachments/assets/35c3222e-cab9-4622-9558-42d695a6a124" alt="Fine-Tuning and Training Curves" width="100%" height="280" />
+      <strong>📈 微调与训练曲线</strong><br />
+      <img src="https://github.com/user-attachments/assets/35c3222e-cab9-4622-9558-42d695a6a124" alt="微调与训练曲线" width="100%" height="280" />
     </td>
     <td align="center" width="50%">
-      <strong>🏆 OpenCompass Result Dashboard</strong><br />
-      <img src="https://github.com/user-attachments/assets/82bda5cd-5eb8-4481-913b-0a5fa6f7163f" alt="OpenCompass Result Dashboard" width="100%" height="280" />
+      <strong>🏆 OpenCompass 结果看板</strong><br />
+      <img src="https://github.com/user-attachments/assets/82bda5cd-5eb8-4481-913b-0a5fa6f7163f" alt="OpenCompass 结果看板" width="100%" height="280" />
     </td>
   </tr>
   <tr>
     <td align="center" colspan="2">
-      <strong>💬 Model Chat Verification</strong><br />
-      <img src="https://github.com/user-attachments/assets/64c167ba-c94a-4dc6-896b-fdd2a4ca13ba" alt="FineTuning Chat" width="80%" height="280" />
+      <strong>💬 模型对话验证窗口</strong><br />
+      <img src="https://github.com/user-attachments/assets/64c167ba-c94a-4dc6-896b-fdd2a4ca13ba" alt="模型对话验证窗口" width="80%" height="280" />
     </td>
   </tr>
 </table>
 
 ---
 
-## 📦 Quick Start (5-minute setup)
+## 📦 快速开始（5 分钟起步）
 
-### 1. Create the environment and install dependencies
+### 1. 创建环境并安装依赖
 
 ```bash
 conda create -n proda python=3.10 -y
@@ -200,22 +199,22 @@ conda activate proda
 pip install -r requirements.txt
 ```
 
-### 2. Prepare external repositories
+### 2. 准备外部仓库
 
-ProDA depends on the following external projects:
+ProDA 工作台依赖以下外部项目：
 
-- `LLaMA-Factory` for training
-- `OpenCompass` for evaluation
+- `LLaMA-Factory`（训练）
+- `OpenCompass`（评测）
 
-Download both `LLaMA-Factory` and `OpenCompass` into the project directory, then install their dependencies into the `proda` environment according to their own instructions.
+确保将LLaMA-Factory和OpenCompass下载到项目目录中，并按照LLaMA-Factory和OpenCompass项目中提示安装依赖到proda中。
 
-### 3. Launch the backend
+### 3. 启动后端
 
 ```bash
 uvicorn backend.main:app --host 0.0.0.0 --port 8002 --reload --reload-dir backend --reload-dir proda
 ```
 
-### 4. Launch the frontend
+### 4. 启动前端
 
 ```bash
 cd frontend
@@ -223,11 +222,11 @@ yarn install
 yarn dev --host 0.0.0.0 --port 8503
 ```
 
-### 5. Open the IDE
+### 5. 打开页面
 
-Open `http://localhost:8503` in your browser.
+浏览器访问：`http://localhost:8503`
 
-For remote servers, set up port forwarding first:
+远程服务器建议先做端口转发：
 
 ```bash
 ssh -L 8503:localhost:8503 -L 8002:localhost:8002 <your-server>
@@ -235,7 +234,7 @@ ssh -L 8503:localhost:8503 -L 8002:localhost:8002 <your-server>
 
 ---
 
-## 🔬 Recommended Workflow
+## 🔬 工作流建议
 
 ```text
 Create Project
@@ -259,27 +258,27 @@ Second-Round Fine-Tuning
 Second-Round Evaluate with OpenCompass
 ```
 
-1. Create a project
-2. Configure and select an LLM API
-3. Step1: extract the knowledge core
-4. Step2: generate Benchmark data
-5. Step3: generate FineTune data
-6. Step5: run fine-tuning
-7. Step6: run evaluation
-8. Step3: diagnose errors and generate supplement data
-9. Step5: run second-round fine-tuning
-10. Step6 / Step7: compare iteration gains
+1. 创建项目
+2. 配置并选择 LLM API
+3. Step1 抽取知识核心
+4. Step2 生成 Benchmark
+5. Step3 生成 FineTune 数据
+6. Step5 启动微调
+7. Step6 执行评测
+8. Step3 诊断 + 生成补数据
+9. Step5 二轮微调
+10. Step6 / Step7 对比迭代收益
 
 ---
 
-## 🏗️ Project Structure (simplified)
+## 🏗️ 项目结构（简版）
 
 ```text
 ProDA/
-├── backend/                 # FastAPI backend
-├── frontend/                # React + Vite frontend IDE
-├── proda/                   # Core pipeline logic
-├── ui/                      # Legacy Streamlit UI kept for compatibility
+├── backend/                 # FastAPI 后端
+├── frontend/                # React + Vite 前端 IDE
+├── proda/                   # 核心流水线逻辑
+├── ui/                      # 旧版 Streamlit（兼容保留）
 ├── requirements.txt
 ├── README.md
 └── README_zh.md
@@ -287,80 +286,79 @@ ProDA/
 
 ---
 
-## 📂 Artifact Layout
+## 📂 产物落盘位置
 
-Each project's artifacts are stored under:
+每个项目产物在：
 
 ```text
 .proda_projects/<project_id>/
 ```
 
-Common subdirectories:
+常见目录：
 
-- `state.json`: project state
-- `finetune_exports/`: training configs, logs, and training history
-- `model_outputs/`: trained model artifacts
-- `evaluations/opencompass/`: evaluation inputs, results, and history
-- `diagnosis/`: diagnostic reports, supplement data, and history
-- `workflow/`: second-round workflow state
-
----
-
-## ❓ FAQ
-
-### The page does not open. What should I check?
-
-Make sure both frontend and backend are running, and that port forwarding includes both frontend and backend ports.
-
-If you are running in a cluster terminal environment, request a compute node and run `hostname` to get the HTTP host. Then update the API `target` in `frontend/vite.config.ts`.
-
-### Step5 does not show any trainable dataset.
-
-Generate and save data in Step3 first, or finish supplement-data merging.
-
-### OpenCompass evaluation fails.
-
-Check the OpenCompass path, model path, LoRA path, and Python dependency environment.
-
-### Training / evaluation logs look slow.
-
-This is normal in cluster environments, especially during first model load, tokenizer cache building, or multi-GPU initialization.
+- `state.json`：项目状态
+- `finetune_exports/`：训练配置、日志、训练历史
+- `model_outputs/`：训练产物模型
+- `evaluations/opencompass/`：评测输入、结果、历史
+- `diagnosis/`：诊断报告、补数据、历史
+- `workflow/`：二轮流程状态
 
 ---
 
-## 🧭 Current Status
+## ❓ 常见问题
 
-The current version already covers the main loop from data construction to evaluation and diagnostic iteration:
+### 页面打不开？
 
-- Document processing and knowledge extraction
-- Benchmark generation with resume support
-- FineTune data generation
-- Local fine-tuning
-- OpenCompass evaluation
-- Diagnostic reports and supplement data
-- Second-round training iteration
-- Streaming chat verification for fine-tuned models
+检查前后端是否都启动，以及端口转发是否包含前端端口与后端端口。
+若是集群终端环境，在申请计算节点后运行hostname命令获取http地址放进frontend/vite.config.ts的api中的target即可。
+
+### Step5 没有可用训练数据？
+
+先在 Step3 生成并保存数据，或先完成补数据合并。
+
+### OpenCompass 评测失败？
+
+重点检查 OpenCompass 路径、模型路径、LoRA 路径和 Python 依赖环境。
+
+### 日志刷新慢？
+
+在集群环境首次加载模型、构建 tokenizer cache、初始化多卡时是正常现象。
 
 ---
 
-## 🙏 Acknowledgements
+## 🧭 当前状态
 
-ProDA is built on top of these excellent projects and ecosystems:
+当前版本已覆盖从数据构建到模型评测与诊断迭代的主闭环，包含：
 
-- [LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory) — efficient fine-tuning framework
-- [OpenCompass](https://github.com/open-compass/opencompass) — large-model evaluation system
-- [FastAPI](https://fastapi.tiangolo.com/) — backend API service
-- [React](https://react.dev/) / [Vite](https://vitejs.dev/) — frontend interaction and tooling
-- VSCode / Cursor — key inspirations for the IDE-style experience
+- 文档处理与知识抽取
+- Benchmark 生成（支持续跑）
+- FineTune 数据生成
+- 本地微调
+- OpenCompass 评测
+- 诊断报告与补数据
+- 二轮训练迭代
+- 微调模型流式对话验证
 
-Thanks also to everyone who provides feedback from real-world domain workflows.  
-ProDA is not intended to be a toy demo; it aims to move closer to a practical workbench for domain model iteration.
+---
+
+## 🙏 致谢
+
+ProDA 的实现离不开这些优秀项目与生态：
+
+- [LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory) — 高效微调训练框架
+- [OpenCompass](https://github.com/open-compass/opencompass) — 大模型评测体系
+- [FastAPI](https://fastapi.tiangolo.com/) — 后端 API 服务
+- [React](https://react.dev/) / [Vite](https://vitejs.dev/) — 前端交互与工程化
+- VSCode / Cursor — ProDA IDE 风格的重要灵感来源
+
+也感谢所有真实业务场景中的反馈者：  
+ProDA 的目标不是做一个玩具 Demo，而是持续靠近“能真正支撑领域模型迭代”的工作台。
 
 ---
 
 ## ⭐ Star History
 
-If this project helps you, please consider giving it a Star.  
+如果这个项目对你有帮助，欢迎点一个 Star。  
 
 <p align="center">
   <picture>
@@ -381,24 +379,24 @@ If this project helps you, please consider giving it a Star.
 
 ---
 
-## 🤝 Contributing
+## 🤝 贡献与交流
 
-Issues and PRs are welcome.
+欢迎提 Issue / PR 一起完善 ProDA。
 
-Good contribution directions include:
+你可以从这些方向参与：
 
-- More real-world domain data workflows
-- Better OpenCompass sample-level visualizations
-- Stronger diagnostic reports and supplement strategies
-- Better cluster deployment documentation
-- Docker / Conda environment files
-- README screenshots, demos, and tutorials
+- 补充更多真实领域数据工作流
+- 优化 OpenCompass 样本级可视化
+- 增强诊断报告与补数据策略
+- 添加更完善的集群部署文档
+- 补充 Docker / Conda 环境文件
+- 改进 README 截图、Demo 与教程
 
-If you have a real-world scenario in education, healthcare, finance, industry, or other vertical domains, feedback is especially welcome.
+如果你有真实业务场景（教育、医疗、金融、工业等），非常欢迎反馈，我们会优先补齐高价值能力。
 
 ---
 
-## 📝 Citation
+## 📝 引用
 
 TBD
 
@@ -410,9 +408,9 @@ MIT
 
 <div align="center">
 
-**ProDA is intended for education, research, and technical exchange.**
+**ProDA 仅供教育、研究与技术交流使用。**
 
-If you find this project interesting, feel free to Star / Fork / try the full loop.
+如果你觉得这个项目有意思，欢迎 Star / Fork / 试跑一遍完整闭环。
 
 </div>
 
