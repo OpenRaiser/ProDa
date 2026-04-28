@@ -320,14 +320,26 @@ def collect_samples(
         abbr = str(m.get("abbr", "")).strip()
         if not abbr:
             continue
-        candidate = results_dir / abbr / f"{dataset_abbr}.json"
+        model_results_dir = results_dir / abbr
+        candidate = model_results_dir / f"{dataset_abbr}.json"
         if not candidate.exists():
             # OpenCompass sometimes nests the abbr inside nested model_abbr folders;
             # scan one level deeper as a best-effort fallback.
-            nested = list((results_dir / abbr).glob(f"**/{dataset_abbr}.json"))
-            if not nested:
-                continue
-            candidate = nested[0]
+            nested = list(model_results_dir.glob(f"**/{dataset_abbr}.json"))
+            if nested:
+                candidate = nested[0]
+            else:
+                # If dataset_abbr is customized (e.g. "428test-2"), callers may not pass
+                # it through; fall back to "the newest JSON in this model result dir"
+                # so sample-level drill-down still works.
+                any_json = sorted(
+                    model_results_dir.glob("**/*.json"),
+                    key=lambda p: p.stat().st_mtime,
+                    reverse=True,
+                )
+                if not any_json:
+                    continue
+                candidate = any_json[0]
         data = _load_json_safe(candidate, {})
         if not isinstance(data, dict):
             continue
