@@ -203,7 +203,75 @@ ProDa depends on the following external projects:
 - `LLaMA-Factory` for training
 - `OpenCompass` for evaluation
 
-Download both `LLaMA-Factory` and `OpenCompass` into the project directory, then install their dependencies into the `ProDa` environment according to their own instructions.
+Place `LlamaFactory`, `opencompass`, and `Model` directly under the `ProDA/` root:
+
+```text
+ProDA/
+├── backend/
+├── frontend/
+├── proda/
+├── LlamaFactory/              # training repo
+├── opencompass/               # evaluation repo
+├── Model/                     # put all downloaded local models here
+│   ├── Qwen3-8B/
+│   └── ...
+└── ...
+```
+
+Then install LlamaFactory / OpenCompass dependencies in the same runtime environment.
+
+> Recommendation: in Step5, set `model_root` to `ProDA/Model` so model discovery works out of the box.
+
+### 2.0 Install LlamaFactory / OpenCompass dependencies (required)
+
+The commands below assume you are at `ProDA/` root and `proda` env is already activated.
+
+#### LlamaFactory (from source)
+
+```bash
+cd LlamaFactory
+pip install -e .
+pip install -r requirements/metrics.txt
+cd ..
+```
+
+#### OpenCompass (recommended: from source)
+
+```bash
+cd opencompass
+pip install -e .
+# Optional: full dataset support
+# pip install -e ".[full]"
+# Optional: API evaluation extras
+# pip install -e ".[api]"
+cd ..
+```
+
+> Note: You can install OpenCompass via `pip install -U opencompass`, but source install is recommended here so the project patch script works consistently.
+
+### 2.1 Required OpenCompass patch (multi-choice postprocess)
+
+ProDa Step6 configs enable:
+
+- `eval_cfg.pred_postprocessor = parse_multi_choice_answer` (see `proda/evaluator.py`)
+
+To make this work on a clean upstream OpenCompass checkout, run exactly one command at `ProDA/` root:
+
+```bash
+bash scripts/patch_opencompass_postprocess.sh
+```
+
+This script applies the SAME local logic used in your current setup to `ProDA/opencompass`:
+
+- inject/register `parse_multi_choice_answer` into `opencompass/utils/text_postprocessors.py`
+- inject robust postprocessor load/reload fallback into `opencompass/tasks/openicl_eval.py`
+- inject the same prompt-extraction logic for compact details output
+- run import + registry checks automatically after patching
+
+> If your OpenCompass is not at the default location, pass a path:
+> `bash scripts/patch_opencompass_postprocess.sh /path/to/opencompass`
+
+If the script fails, your OpenCompass version is likely too different from the expected anchors; switch to the matching baseline and retry.
 
 ### 3. Launch the backend
 
@@ -316,7 +384,12 @@ Generate and save data in Step3 first, or finish supplement-data merging.
 
 ### OpenCompass evaluation fails.
 
-Check the OpenCompass path, model path, LoRA path, and Python dependency environment.
+Check all of the following:
+
+- OpenCompass path, base model path, and LoRA path
+- whether OpenCompass and ProDa run in the same Python environment
+- whether OpenCompass completed the 3-step `parse_multi_choice_answer` patch (see 2.1 above)
+- whether Step5 `model_root` points to `ProDA/Model` (to avoid model discovery misses)
 
 ### Training / evaluation logs look slow.
 

@@ -202,7 +202,75 @@ ProDA 工作台依赖以下外部项目：
 - `LLaMA-Factory`（训练）
 - `OpenCompass`（评测）
 
-确保将LLaMA-Factory和OpenCompass下载到项目目录中，并按照LLaMA-Factory和OpenCompass项目中提示安装依赖到proda中。
+请将 `LlamaFactory`、`opencompass`、`Model` 都放在 `ProDA/` 根目录下：
+
+```text
+ProDA/
+├── backend/
+├── frontend/
+├── proda/
+├── LlamaFactory/              # 训练仓库
+├── opencompass/               # 评测仓库
+├── Model/                     # 你下载的本地模型统一放这里
+│   ├── Qwen3-8B/
+│   └── ...
+└── ...
+```
+
+然后按 LlamaFactory / OpenCompass 官方文档安装依赖到同一个运行环境中。
+
+> 建议：Step5 页面里将 `model_root` 配置为 `ProDA/Model`，后续训练与评测选模会更直接。
+
+### 2.0 安装 LlamaFactory / OpenCompass 依赖（必做）
+
+以下命令基于你已经在 `ProDA/` 根目录，并且已激活 `proda` 环境：
+
+#### LlamaFactory（from source）
+
+```bash
+cd LlamaFactory
+pip install -e .
+pip install -r requirements/metrics.txt
+cd ..
+```
+
+#### OpenCompass（推荐 from source）
+
+```bash
+cd opencompass
+pip install -e .
+# 如需更多数据集支持，可选：
+# pip install -e ".[full]"
+# 如需 API 评测能力，可选：
+# pip install -e ".[api]"
+cd ..
+```
+
+> 说明：你也可以用 `pip install -U opencompass` 安装 pip 版，但为了和本项目补丁脚本保持一致，建议使用 source 方式。
+
+### 2.1 OpenCompass 必改补丁（多选后处理，必须做）
+
+ProDA 的 Step6 配置会默认启用：
+
+- `eval_cfg.pred_postprocessor = parse_multi_choice_answer`（见 `proda/evaluator.py`）
+
+为了确保任何用户下载“纯上游 opencompass”后也能直接跑通，请在 `ProDA/` 根目录执行下面这一条命令：
+
+```bash
+bash scripts/patch_opencompass_postprocess.sh
+```
+
+该脚本会一次性把 **你当前本地同款逻辑** 打到 `ProDA/opencompass`：
+
+- 在 `opencompass/utils/text_postprocessors.py` 注入并注册 `parse_multi_choice_answer`
+- 在 `opencompass/tasks/openicl_eval.py` 注入后处理器强制加载/重载兜底逻辑
+- 同步注入你当前本地用于详情压缩的 prompt 提取逻辑（保持与现有行为一致）
+- 执行补丁后自动做 import + registry 自检
+
+> 如 opencompass 目录不在默认位置，可传路径：
+> `bash scripts/patch_opencompass_postprocess.sh /path/to/opencompass`
+
+若脚本失败，通常是 opencompass 版本与当前补丁锚点差异过大；建议切换到与你当前项目一致的 opencompass 代码后重试。
 
 ### 3. 启动后端
 
@@ -314,7 +382,12 @@ ProDA/
 
 ### OpenCompass 评测失败？
 
-重点检查 OpenCompass 路径、模型路径、LoRA 路径和 Python 依赖环境。
+重点检查以下几项：
+
+- OpenCompass 路径、模型路径、LoRA 路径是否正确
+- OpenCompass 与 ProDA 是否在同一 Python 环境
+- OpenCompass 是否完成了 `parse_multi_choice_answer` 三步补丁（见上方 2.1）
+- Step5 的 `model_root` 是否指向 `ProDA/Model`（避免模型扫描不到）
 
 ### 日志刷新慢？
 
