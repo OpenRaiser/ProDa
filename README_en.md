@@ -1,8 +1,6 @@
 <div align="center">
 
-<img src="https://github.com/user-attachments/assets/91bdab9a-cc76-49b7-a6e6-c86271816602" alt="ProDA Logo" width="320" />
-
-# ProDA
+<img src="https://github.com/user-attachments/assets/7f579d02-acc3-492e-9b24-ad508eb8cfa2" alt="ProDa Logo" width="320" />
 
 **An AI data-construction and model-iteration workbench for vertical domains**  
 **From raw documents to Benchmark / SFT / fine-tuning / evaluation / diagnostic data augmentation, all in one loop.**
@@ -30,7 +28,7 @@
 
 ---
 
-> ProDA is not just a collection of data-generation scripts. It is a **VSCode-style Web IDE** built for iterative model improvement.  
+> ProDa is not just a collection of data-generation scripts. It is a **VSCode-style Web IDE** built for iterative model improvement.  
 > It integrates document parsing, knowledge extraction, Benchmark construction, SFT data generation, LLaMA-Factory fine-tuning, OpenCompass evaluation, error diagnosis, and second-round data augmentation into one traceable project workflow.
 
 ```text
@@ -53,7 +51,7 @@ Second-Round Iteration
 
 ## 📖 Table of Contents
 
-- [🚀 Why ProDA](#-why-proda)
+- [🚀 Why ProDa](#-why-ProDa)
 - [🖼️ Showcase](#️-showcase-placeholders-for-now)
 - [✨ What You Get](#-what-you-get)
 - [📦 Quick Start](#-quick-start-5-minute-setup)
@@ -71,7 +69,7 @@ Second-Round Iteration
 
 ---
 
-## 🚀 Why ProDA
+## 🚀 Why ProDa
 
 You may have run into these problems:
 
@@ -79,9 +77,9 @@ You may have run into these problems:
 - Benchmark generation, SFT data construction, training, and evaluation are scattered across scripts.
 - After fine-tuning, a single score does not tell you what the model got wrong or how to improve it.
 
-**ProDA turns the whole process into a visual, project-based, traceable loop.**
+**ProDa turns the whole process into a visual, project-based, traceable loop.**
 
-| Traditional workflow | ProDA |
+| Traditional workflow | ProDa |
 | --- | --- |
 | Multiple scripts glued together manually | One project workbench for the full pipeline |
 | Data, training logs, and eval outputs scattered around | All states and artifacts are automatically archived per project |
@@ -157,13 +155,11 @@ You may have run into these problems:
 
 ## 🖼️ Showcase
 
-> Screenshot slots are kept intentionally. Add real images later without changing the README structure.
-
 <table>
   <tr>
     <td align="center" width="50%">
       <strong>🖥️ IDE Overview</strong><br />
-      <img src="https://github.com/user-attachments/assets/57e7c482-abb5-495c-b3f1-7921788424bc" alt="ProDA IDE Overview" width="100%" height="280" />
+      <img src="https://github.com/user-attachments/assets/57e7c482-abb5-495c-b3f1-7921788424bc" alt="ProDa IDE Overview" width="100%" height="280" />
     </td>
     <td align="center" width="50%">
       <strong>📚 Document Extraction and Knowledge Core</strong><br />
@@ -195,24 +191,24 @@ You may have run into these problems:
 ### 1. Create the environment and install dependencies
 
 ```bash
-conda create -n proda python=3.10 -y
-conda activate proda
+conda create -n ProDa python=3.10 -y
+conda activate ProDa
 pip install -r requirements.txt
 ```
 
 ### 2. Prepare external repositories
 
-ProDA depends on the following external projects:
+ProDa depends on the following external projects:
 
 - `LLaMA-Factory` for training
 - `OpenCompass` for evaluation
 
-Download both `LLaMA-Factory` and `OpenCompass` into the project directory, then install their dependencies into the `proda` environment according to their own instructions.
+Download both `LLaMA-Factory` and `OpenCompass` into the project directory, then install their dependencies into the `ProDa` environment according to their own instructions.
 
 ### 3. Launch the backend
 
 ```bash
-uvicorn backend.main:app --host 0.0.0.0 --port 8002 --reload --reload-dir backend --reload-dir proda
+uvicorn backend.main:app --host 0.0.0.0 --port 8002 --reload --reload-dir backend --reload-dir ProDa
 ```
 
 ### 4. Launch the frontend
@@ -275,10 +271,10 @@ Second-Round Evaluate with OpenCompass
 ## 🏗️ Project Structure (simplified)
 
 ```text
-ProDA/
+ProDa/
 ├── backend/                 # FastAPI backend
 ├── frontend/                # React + Vite frontend IDE
-├── proda/                   # Core pipeline logic
+├── ProDa/                   # Core pipeline logic
 ├── ui/                      # Legacy Streamlit UI kept for compatibility
 ├── requirements.txt
 ├── README.md
@@ -292,7 +288,7 @@ ProDA/
 Each project's artifacts are stored under:
 
 ```text
-.proda_projects/<project_id>/
+.ProDa_projects/<project_id>/
 ```
 
 Common subdirectories:
@@ -345,7 +341,7 @@ The current version already covers the main loop from data construction to evalu
 
 ## 🙏 Acknowledgements
 
-ProDA is built on top of these excellent projects and ecosystems:
+ProDa is built on top of these excellent projects and ecosystems:
 
 - [LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory) — efficient fine-tuning framework
 - [OpenCompass](https://github.com/open-compass/opencompass) — large-model evaluation system
@@ -354,7 +350,7 @@ ProDA is built on top of these excellent projects and ecosystems:
 - VSCode / Cursor — key inspirations for the IDE-style experience
 
 Thanks also to everyone who provides feedback from real-world domain workflows.  
-ProDA is not intended to be a toy demo; it aims to move closer to a practical workbench for domain model iteration.
+ProDa is not intended to be a toy demo; it aims to move closer to a practical workbench for domain model iteration.
 
 ---
 
@@ -410,7 +406,7 @@ MIT
 
 <div align="center">
 
-**ProDA is intended for education, research, and technical exchange.**
+**ProDa is intended for education, research, and technical exchange.**
 
 If you find this project interesting, feel free to Star / Fork / try the full loop.
 
