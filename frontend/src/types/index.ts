@@ -34,6 +34,7 @@ export type PageId =
   | "fine_tuning"
   | "opencompass"
   | "results"
+  | "one_click_deploy"
   | "llm_config";
 
 export interface Tab {

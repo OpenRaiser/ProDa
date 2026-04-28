@@ -37,6 +37,12 @@ export const WORKFLOW_STEPS: WorkflowStep[] = [
     file: "7_results.py",
     stepNumber: 7,
   },
+  {
+    id: "one_click_deploy",
+    key: "workflow.step8",
+    file: "8_one_click_deploy.py",
+    stepNumber: 8,
+  },
 ];
 
 export function findWorkflowStep(id: PageId): WorkflowStep | undefined {

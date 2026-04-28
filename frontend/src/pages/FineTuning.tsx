@@ -7,7 +7,6 @@ import {
   FileCode2,
   FileText,
   Loader2,
-  MessageSquare,
   Play,
   RefreshCw,
   Settings2,
@@ -49,7 +48,6 @@ import type {
   TrainingConfig,
   TrainingSession,
 } from "@/types";
-import { ModelChatModal } from "@/pages/finetune/ModelChatModal";
 
 const DEFAULT_CONFIG: TrainingConfig = {
   dataset_source: "session",
@@ -111,7 +109,6 @@ export function FineTuning() {
   const [canceling, setCanceling] = useState(false);
 
   const [outputTree, setOutputTree] = useState<OutputTreeEntry[]>([]);
-  const [chatOpen, setChatOpen] = useState(false);
 
   const handleSelectHistory = useCallback(
     async (session: TrainingSession) => {
@@ -722,19 +719,6 @@ export function FineTuning() {
                 {t("ftune.cancel")}
               </button>
             )}
-            <button
-              className="vs-btn-secondary flex items-center gap-2"
-              onClick={() => setChatOpen(true)}
-              disabled={!history.some((h) => h.status === "finished")}
-              title={
-                history.some((h) => h.status === "finished")
-                  ? ""
-                  : t("ftune.chat_need_finished_run")
-              }
-            >
-              <MessageSquare size={13} />
-              {t("ftune.chat_open")}
-            </button>
             {launchError && (
               <span className="text-[12px] text-[#f48771] flex items-center gap-1">
                 <AlertCircle size={12} />
@@ -776,11 +760,6 @@ export function FineTuning() {
           </section>
         )}
       </div>
-      <ModelChatModal
-        projectId={project?.id}
-        open={chatOpen}
-        onClose={() => setChatOpen(false)}
-      />
     </div>
   );
 }

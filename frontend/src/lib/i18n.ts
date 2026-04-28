@@ -113,6 +113,7 @@ export const translations: Record<Language, Record<string, string>> = {
     "workflow.step5": "模型微调",
     "workflow.step6": "OpenCompass 评测",
     "workflow.step7": "结果导出",
+    "workflow.step8": "一键部署",
 
     "command.title": "命令面板",
     "command.placeholder": "输入命令...",
@@ -154,6 +155,7 @@ export const translations: Record<Language, Record<string, string>> = {
     "page.fine_tuning.file": "5_fine_tuning.py",
     "page.opencompass.file": "6_opencompass.py",
     "page.results.file": "7_results.py",
+    "page.one_click_deploy.file": "8_one_click_deploy.py",
     "page.llm_config.file": "settings.json",
 
     "placeholder.coming_soon": "该页面尚未实现。",
@@ -654,6 +656,9 @@ export const translations: Record<Language, Record<string, string>> = {
     "results.preview_binary": "二进制文件或太大，无法在浏览器内预览",
     "results.export_done": "产物打包已开始下载",
     "results.export_failed": "打包失败",
+    "deploy.title": "一键部署",
+    "deploy.desc": "将某次微调产物（最终模型或 checkpoint）一键部署到本地并直接对话。",
+    "deploy.need_project": "请先打开一个项目，再进行模型部署与对话。",
   },
   en: {
     "app.title": "ProDa",
@@ -765,6 +770,7 @@ export const translations: Record<Language, Record<string, string>> = {
     "workflow.step5": "Model Fine-Tuning",
     "workflow.step6": "OpenCompass Evaluation",
     "workflow.step7": "Results Export",
+    "workflow.step8": "One-click Deployment",
 
     "command.title": "Command Palette",
     "command.placeholder": "Type a command...",
@@ -806,6 +812,7 @@ export const translations: Record<Language, Record<string, string>> = {
     "page.fine_tuning.file": "5_fine_tuning.py",
     "page.opencompass.file": "6_opencompass.py",
     "page.results.file": "7_results.py",
+    "page.one_click_deploy.file": "8_one_click_deploy.py",
     "page.llm_config.file": "settings.json",
 
     "placeholder.coming_soon": "This page is not implemented in this build.",
@@ -1306,6 +1313,9 @@ export const translations: Record<Language, Record<string, string>> = {
     "results.preview_binary": "Binary or too large to preview in-browser",
     "results.export_done": "Export bundle download started",
     "results.export_failed": "Export bundle failed",
+    "deploy.title": "One-click Deployment",
+    "deploy.desc": "Deploy a fine-tuned output (final model or checkpoint) to local runtime and chat immediately.",
+    "deploy.need_project": "Open a project first to deploy and chat with a model.",
   },
 };
 

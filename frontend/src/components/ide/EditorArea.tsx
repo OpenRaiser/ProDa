@@ -8,6 +8,7 @@ import { FineTune } from "@/pages/FineTune";
 import { FineTuning } from "@/pages/FineTuning";
 import { OpenCompass } from "@/pages/OpenCompass";
 import { Results } from "@/pages/Results";
+import { OneClickDeploy } from "@/pages/OneClickDeploy";
 import { useI18n } from "@/hooks/useI18n";
 
 export function EditorArea() {
@@ -40,6 +41,8 @@ export function EditorArea() {
       return <OpenCompass />;
     case "results":
       return <Results />;
+    case "one_click_deploy":
+      return <OneClickDeploy />;
     default:
       return <Placeholder pageId={active.pageId} />;
   }
