@@ -158,7 +158,7 @@ You may have run into these problems:
 <p align="center">
   <strong>🎬 Project Walkthrough Video (click to play)</strong><br />
   <!-- Replace the URL below with your real video link -->
-  <video src="https://github.com/user-attachments/assets/052f7b24-05ef-4bfd-a8fe-e0c6a672ad68" controls width="100%"></video>
+  <video src="https://github.com/user-attachments/assets/e4bda307-a898-4843-abe6-7667ae45e790" controls width="100%"></video>
 </p>
 
 <table>
