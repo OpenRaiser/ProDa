@@ -155,6 +155,12 @@ You may have run into these problems:
 
 ## 🖼️ Showcase
 
+<p align="center">
+  <strong>🎬 Project Walkthrough Video (click to play)</strong><br />
+  <!-- Replace the URL below with your real video link -->
+  <video src="https://github.com/user-attachments/assets/052f7b24-05ef-4bfd-a8fe-e0c6a672ad68" controls width="100%"></video>
+</p>
+
 <table>
   <tr>
     <td align="center" width="50%">

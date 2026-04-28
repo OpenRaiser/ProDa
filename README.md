@@ -154,6 +154,12 @@ Second-Round Iteration
 
 ## 🖼️ 效果展示
 
+<p align="center">
+  <strong>🎬 项目讲解视频（点击播放）</strong><br />
+  <!-- 将下面链接替换为你的实际视频地址 -->
+  <video src="https://github.com/user-attachments/assets/052f7b24-05ef-4bfd-a8fe-e0c6a672ad68" controls width="100%"></video>
+</p>
+
 <table>
   <tr>
     <td align="center" width="50%">
