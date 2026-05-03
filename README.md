@@ -473,8 +473,14 @@ ProDa 的目标不是做一个玩具 Demo，而是持续靠近“能真正支撑
 
 ## 📝 引用
 
-TBD
-
+```
+@article{pan2026programming,
+  title={Programming with Data: Test-Driven Data Engineering for Self-Improving LLMs from Raw Corpora},
+  author={Pan, Chenkai and Xu, Xinglong and Xu, Yuhang and Wu, Yujun and Li, Siyuan and Chen, Jintao and He, Conghui and Wei, Jingxuan and Tan, Cheng},
+  journal={arXiv preprint arXiv:2604.24819},
+  year={2026}
+}
+```
 ---
 
 ## 📄 License
