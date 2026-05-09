@@ -435,22 +435,15 @@ ProDa 的目标不是做一个玩具 Demo，而是持续靠近“能真正支撑
 
 如果这个项目对你有帮助，欢迎点一个 Star。  
 
-<p align="center">
-  <picture>
-    <source
-      media="(prefers-color-scheme: dark)"
-      srcset="https://api.star-history.com/svg?repos=https://github.com/OpenRaiser/ProDa&type=Date&theme=dark"
-    />
-    <source
-      media="(prefers-color-scheme: light)"
-      srcset="https://api.star-history.com/svg?repos=https://github.com/OpenRaiser/ProDa&type=Date"
-    />
-    <img
-      alt="Star History Chart"
-      src="https://api.star-history.com/svg?repos=https://github.com/OpenRaiser/ProDa&type=Date"
-    />
-  </picture>
-</p>
+<div align="center">
+  <a href="https://star-history.com/#OpenRaiser/NanoResearch&Date">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=OpenRaiser/ProDa&type=Date&theme=dark" />
+      <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=OpenRaiser/ProDa&type=Date" />
+      <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=OpenRaiser/ProDa&type=Date" width="100%" />
+    </picture>
+  </a>
+</div>
 
 ---
 
