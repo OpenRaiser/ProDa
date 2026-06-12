@@ -1,0 +1,1022 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Programming with Data: Test-Driven Data Engineering for Self-Improving LLMs from Raw Corpora</title>
+  <link rel="icon" type="image/png" href="images/proda/logos/icon.png" />
+  <link rel="apple-touch-icon" href="images/proda/logos/icon.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
+    :root {
+      color-scheme: light;
+      --paper-bg: #ffffff;
+      --page-bg: #fafafa;
+      --section-mint: #f2f8f6;
+      --section-ivory: #fcfbf6;
+      --ink: #2c3e50;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --teal: #4198ac;
+      --teal-dark: #2f7f8f;
+      --warm: #ed8d5a;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--page-bg);
+      color: var(--ink);
+    }
+
+    ::selection {
+      background: rgba(65, 152, 172, 0.18);
+    }
+
+    .section-anchor {
+      scroll-margin-top: 5rem;
+    }
+
+    .figure-frame {
+      border: 1px solid var(--line);
+      background: var(--paper-bg);
+      border-radius: 8px;
+      box-shadow: none;
+      transition: border-color 160ms ease, background-color 160ms ease, transform 160ms ease;
+    }
+
+    .metric-card {
+      border: 1px solid var(--line);
+      background: var(--paper-bg);
+      border-radius: 8px;
+      box-shadow: none;
+      transition: border-color 160ms ease, background-color 160ms ease, transform 160ms ease;
+    }
+
+    .figure-frame:hover,
+    .metric-card:hover {
+      border-color: rgba(65, 152, 172, 0.38);
+      box-shadow: none !important;
+    }
+
+    .tab-btn[aria-selected="true"] {
+      background: var(--teal);
+      color: #ffffff;
+      border-color: var(--teal);
+    }
+
+    .tab-btn:focus-visible,
+    button:focus-visible,
+    a:focus-visible {
+      outline: 2px solid rgba(237, 141, 90, 0.75);
+      outline-offset: 3px;
+    }
+
+    .modal-open {
+      overflow: hidden;
+    }
+
+    .bg-white {
+      background-color: var(--paper-bg) !important;
+    }
+
+    .bg-slate-50 {
+      background-color: var(--section-mint) !important;
+    }
+
+    .bg-gray-50 {
+      background-color: var(--section-ivory) !important;
+    }
+
+    .bg-gray-950 {
+      background-color: var(--ink) !important;
+    }
+
+    .bg-blue-700 {
+      background-color: var(--teal) !important;
+    }
+
+    .bg-emerald-700 {
+      background-color: #51999f !important;
+    }
+
+    .bg-amber-700 {
+      background-color: var(--warm) !important;
+    }
+
+    .hover\:bg-blue-800:hover,
+    .hover\:bg-gray-800:hover {
+      background-color: var(--teal-dark) !important;
+    }
+
+    .text-gray-950,
+    .text-gray-900,
+    .text-gray-800 {
+      color: var(--ink) !important;
+    }
+
+    .text-gray-700 {
+      color: #475569 !important;
+    }
+
+    .text-gray-600,
+    .text-gray-500 {
+      color: var(--muted) !important;
+    }
+
+    .text-blue-700,
+    .hover\:text-blue-700:hover {
+      color: var(--teal) !important;
+    }
+
+    .text-emerald-700,
+    .text-blue-300,
+    .text-amber-700 {
+      color: var(--warm) !important;
+    }
+
+    .border-gray-200,
+    .border-gray-300,
+    .divide-gray-200> :not([hidden])~ :not([hidden]) {
+      border-color: var(--line) !important;
+    }
+
+    .shadow-sm,
+    .shadow-lg,
+    .shadow-2xl,
+    .hover\:shadow-lg:hover {
+      box-shadow: none !important;
+    }
+
+    .hover\:-translate-y-1:hover {
+      transform: none !important;
+    }
+
+    .backdrop-blur-md {
+      backdrop-filter: none !important;
+    }
+
+    .resource-button {
+      border-color: rgba(65, 152, 172, 0.35) !important;
+    }
+
+    .resource-button:hover {
+      background: var(--section-mint) !important;
+    }
+
+    .stat-number {
+      color: var(--teal) !important;
+    }
+
+    .warm-number {
+      color: var(--warm) !important;
+    }
+  </style>
+</head>
+
+<body class="bg-white text-gray-800">
+  <header class="sticky top-0 z-50 border-b border-gray-200 bg-white">
+    <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
+      <a href="#home" class="inline-flex items-center gap-2 text-xl font-extrabold tracking-tight text-gray-950">
+        <img src="images/proda/logos/icon.png" alt="" class="h-9 w-9 rounded-full object-cover" />
+        <span>ProDa</span>
+      </a>
+      <nav class="hidden items-center gap-6 text-sm font-medium text-gray-700 md:flex" aria-label="Primary navigation">
+        <a class="hover:text-blue-700" href="#home">Home</a>
+        <a class="hover:text-blue-700" href="#idea">Idea</a>
+        <a class="hover:text-blue-700" href="#framework">Framework</a>
+        <a class="hover:text-blue-700" href="#prodalib">ProDalib</a>
+        <a class="hover:text-blue-700" href="#benchmark">Benchmark</a>
+        <a class="hover:text-blue-700" href="#results">Results</a>
+        <a class="hover:text-blue-700" href="#studio">Studio</a>
+        <a class="hover:text-blue-700" href="#citation">Citation</a>
+      </nav>
+      <div class="flex items-center gap-2">
+        <a href="https://github.com/OpenRaiser/ProDa" target="_blank" rel="noreferrer"
+          class="inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-700 transition hover:bg-gray-100"
+          aria-label="Open GitHub repository">
+          <img src="images/proda/logos/github_logo.png" alt="" class="h-5 w-5 object-contain" />
+        </a>
+        <button id="mobileMenuButton"
+          class="inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-700 transition hover:bg-gray-100 md:hidden"
+          type="button" aria-label="Open navigation" aria-expanded="false">
+          <i data-lucide="menu" class="h-5 w-5"></i>
+        </button>
+      </div>
+    </div>
+    <nav id="mobileMenu"
+      class="hidden border-t border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 md:hidden">
+      <div class="grid grid-cols-2 gap-3">
+        <a href="#home">Home</a>
+        <a href="#idea">Idea</a>
+        <a href="#framework">Framework</a>
+        <a href="#prodalib">ProDalib</a>
+        <a href="#benchmark">Benchmark</a>
+        <a href="#results">Results</a>
+        <a href="#studio">Studio</a>
+        <a href="#citation">Citation</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section id="home" class="section-anchor bg-white px-4 py-14 md:py-20">
+      <div class="mx-auto max-w-6xl text-center">
+        <p class="mb-4 text-sm font-semibold uppercase tracking-[0.16em] text-blue-700">Programming with Data</p>
+        <h1 class="mx-auto max-w-5xl text-4xl font-extrabold leading-tight tracking-tight text-gray-950 md:text-6xl">
+          Programming with Data: Test-Driven Data Engineering for Self-Improving LLMs from Raw Corpora
+        </h1>
+        <p class="mx-auto mt-6 max-w-4xl text-lg leading-8 text-gray-600">
+          ProDa closes the loop in LLM data engineering by treating training data as source code, model training as
+          compilation, benchmarking as unit testing, and failure-driven data repair as debugging.
+        </p>
+
+        <div class="mx-auto mt-8 flex max-w-5xl flex-wrap justify-center gap-x-4 gap-y-2 text-base text-gray-800">
+          <span>Chenkai Pan</span>
+          <span>Xinglong Xu</span>
+          <span>Yuhang Xu</span>
+          <span>Yujun Wu</span>
+          <span>Siyuan Li</span>
+          <span>Jintao Chen</span>
+          <span>Conghui He</span>
+          <span>Jingxuan Wei</span>
+          <span>Cheng Tan</span>
+        </div>
+        <p class="mx-auto mt-3 max-w-4xl text-sm text-gray-500">
+          Zhejiang University; University of Chinese Academy of Sciences; Shanghai Artificial Intelligence Laboratory
+        </p>
+
+        <div class="mt-8 flex flex-wrap justify-center gap-3">
+          <a class="inline-flex items-center gap-2 rounded-md bg-blue-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-800"
+            href="https://arxiv.org/abs/2604.24819">
+            <i data-lucide="file-text" class="h-4 w-4"></i>
+            Paper
+          </a>
+          <a class="resource-button inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-5 py-3 text-sm font-semibold text-gray-900 transition hover:bg-gray-50"
+            href="https://github.com/OpenRaiser/ProDa" target="_blank" rel="noreferrer">
+            <img src="images/proda/logos/github_logo.png" alt="" class="h-4 w-4 object-contain" />
+            Code
+          </a>
+          <a class="resource-button inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-5 py-3 text-sm font-semibold text-gray-900 transition hover:bg-gray-50"
+            href="https://huggingface.co/datasets/OpenRaiser/ProDalib" target="_blank" rel="noreferrer">
+            <img src="images/proda/logos/huggingface_logo.png" alt="" class="h-4 w-4 object-contain" />
+            Dataset
+          </a>
+        </div>
+
+        <div class="mx-auto mt-10 grid max-w-5xl grid-cols-2 gap-3 text-left sm:grid-cols-3 lg:grid-cols-6">
+          <div class="metric-card p-4">
+            <div class="stat-number text-xl font-bold text-gray-950">117k</div>
+            <div class="text-xs text-gray-500">raw documents</div>
+          </div>
+          <div class="metric-card p-4">
+            <div class="stat-number text-xl font-bold text-gray-950">15B</div>
+            <div class="text-xs text-gray-500">raw tokens</div>
+          </div>
+          <div class="metric-card p-4">
+            <div class="stat-number text-xl font-bold text-gray-950">227k</div>
+            <div class="text-xs text-gray-500">key concepts</div>
+          </div>
+          <div class="metric-card p-4">
+            <div class="stat-number text-xl font-bold text-gray-950">16k</div>
+            <div class="text-xs text-gray-500">benchmark items</div>
+          </div>
+          <div class="metric-card p-4">
+            <div class="stat-number text-xl font-bold text-gray-950">160k</div>
+            <div class="text-xs text-gray-500">SFT samples</div>
+          </div>
+          <div class="metric-card p-4">
+            <div class="stat-number text-xl font-bold text-gray-950">16</div>
+            <div class="text-xs text-gray-500">disciplines</div>
+          </div>
+        </div>
+
+        <button class="figure-frame mt-10 block w-full p-3" type="button" data-figure="images/proda/figures/teaser.png"
+          data-title="Programming with Data conceptual correspondence">
+          <img class="mx-auto max-h-[680px] w-full object-contain" src="images/proda/figures/teaser.png"
+            alt="ProDa conceptual correspondence" />
+        </button>
+      </div>
+    </section>
+
+    <section id="idea" class="section-anchor bg-slate-50 px-4 py-16 md:py-20">
+      <div class="mx-auto max-w-7xl">
+        <div class="mx-auto max-w-4xl text-center">
+          <p class="text-sm font-semibold uppercase tracking-[0.16em] text-blue-700">Core idea</p>
+          <h2 class="mt-3 text-3xl font-bold tracking-tight text-gray-950 md:text-4xl">Data engineering as a test-driven
+            programming loop</h2>
+          <p class="mt-5 text-lg leading-8 text-gray-600">
+            Instead of adding more data blindly when a model fails, ProDa traces benchmark failures to concept-level
+            and reasoning-chain deficits, then generates targeted data patches grounded in the original corpus.
+          </p>
+        </div>
+
+        <div class="mt-10 grid gap-4 md:grid-cols-5">
+          <article class="metric-card p-5">
+            <i data-lucide="scroll-text" class="h-7 w-7 text-blue-700"></i>
+            <h3 class="mt-4 font-bold text-gray-950">Raw Corpus as Specification</h3>
+            <p class="mt-2 text-sm leading-6 text-gray-600">The raw domain corpus defines the knowledge scope and
+              constraints the model should satisfy.</p>
+          </article>
+          <article class="metric-card p-5">
+            <i data-lucide="file-code-2" class="h-7 w-7 text-blue-700"></i>
+            <h3 class="mt-4 font-bold text-gray-950">Training Data as Source Code</h3>
+            <p class="mt-2 text-sm leading-6 text-gray-600">Synthesized SFT data explicitly encodes concepts, relations,
+              and reasoning patterns.</p>
+          </article>
+          <article class="metric-card p-5">
+            <i data-lucide="cpu" class="h-7 w-7 text-blue-700"></i>
+            <h3 class="mt-4 font-bold text-gray-950">Training as Compilation</h3>
+            <p class="mt-2 text-sm leading-6 text-gray-600">Fine-tuning compiles human-readable training data into
+              executable model weights.</p>
+          </article>
+          <article class="metric-card p-5">
+            <i data-lucide="test-tube-2" class="h-7 w-7 text-blue-700"></i>
+            <h3 class="mt-4 font-bold text-gray-950">Benchmarking as Unit Testing</h3>
+            <p class="mt-2 text-sm leading-6 text-gray-600">ProDa-16 tests whether the compiled model implements the
+              corpus-derived specification.</p>
+          </article>
+          <article class="metric-card p-5">
+            <i data-lucide="bug" class="h-7 w-7 text-blue-700"></i>
+            <h3 class="mt-4 font-bold text-gray-950">Data Debugging as Bug Fixing</h3>
+            <p class="mt-2 text-sm leading-6 text-gray-600">Failures are traced through the shared knowledge structure
+              and repaired with targeted data patches.</p>
+          </article>
+        </div>
+
+        <button class="figure-frame mx-auto mt-10 block w-full max-w-6xl p-3" type="button"
+          data-figure="images/proda/figures/intro.png"
+          data-title="Open-loop data engineering versus ProDa closed-loop repair">
+          <img class="h-auto w-full object-contain" src="images/proda/figures/intro.png"
+            alt="Open-loop data engineering versus ProDa closed-loop repair" />
+        </button>
+      </div>
+    </section>
+
+    <section id="framework" class="section-anchor bg-white px-4 py-16 md:py-20">
+      <div class="mx-auto max-w-7xl">
+        <div class="mx-auto max-w-4xl text-center">
+          <p class="text-sm font-semibold uppercase tracking-[0.16em] text-blue-700">Framework</p>
+          <h2 class="mt-3 text-3xl font-bold tracking-tight text-gray-950 md:text-4xl">Tester, Builder, Debugger</h2>
+          <p class="mt-5 text-lg leading-8 text-gray-600">
+            ProDa connects evaluation and data generation through one shared structured knowledge representation.
+          </p>
+        </div>
+
+        <div class="mt-10 grid gap-6 md:grid-cols-3">
+          <article class="metric-card p-6 text-left">
+            <div class="flex h-12 w-12 items-center justify-center rounded-md bg-blue-700 text-white"><i
+                data-lucide="clipboard-check" class="h-6 w-6"></i></div>
+            <h3 class="mt-5 text-xl font-bold text-gray-950">Tester</h3>
+            <p class="mt-3 text-sm leading-6 text-gray-600">Extracts structured knowledge from raw corpora and compiles
+              it into rigorous benchmarks before training begins.</p>
+          </article>
+          <article class="metric-card p-6 text-left">
+            <div class="flex h-12 w-12 items-center justify-center rounded-md bg-emerald-700 text-white"><i
+                data-lucide="hammer" class="h-6 w-6"></i></div>
+            <h3 class="mt-5 text-xl font-bold text-gray-950">Builder</h3>
+            <p class="mt-3 text-sm leading-6 text-gray-600">Synthesizes training data from the same knowledge structure,
+              separating knowledge content from reasoning structure.</p>
+          </article>
+          <article class="metric-card p-6 text-left">
+            <div class="flex h-12 w-12 items-center justify-center rounded-md bg-amber-700 text-white"><i
+                data-lucide="wrench" class="h-6 w-6"></i></div>
+            <h3 class="mt-5 text-xl font-bold text-gray-950">Debugger</h3>
+            <p class="mt-3 text-sm leading-6 text-gray-600">Treats benchmark failures as runtime errors, locates
+              responsible knowledge nodes, and produces targeted patches.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="prodalib" class="section-anchor bg-slate-50 px-4 py-16 md:py-20">
+      <div class="mx-auto max-w-7xl">
+        <div class="mx-auto max-w-4xl text-center">
+          <p class="text-sm font-semibold uppercase tracking-[0.16em] text-blue-700">ProDalib</p>
+          <h2 class="mt-3 text-3xl font-bold tracking-tight text-gray-950 md:text-4xl">A traceable data suite built from
+            raw educational corpora</h2>
+          <p class="mt-5 text-lg leading-8 text-gray-600">
+            ProDalib packages curated corpus chunks, 227k key concepts, 16k benchmark items, and 160k synthesized
+            training samples across 16 disciplines.
+          </p>
+        </div>
+
+        <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div class="metric-card p-5">
+            <div class="stat-number text-2xl font-bold text-gray-950">48k</div>
+            <div class="mt-1 text-sm text-gray-500">high-quality chunks</div>
+          </div>
+          <div class="metric-card p-5">
+            <div class="stat-number text-2xl font-bold text-gray-950">43,953</div>
+            <div class="mt-1 text-sm text-gray-500">L3 reasoning chains</div>
+          </div>
+          <div class="metric-card p-5">
+            <div class="stat-number text-2xl font-bold text-gray-950">186,784</div>
+            <div class="mt-1 text-sm text-gray-500">L2 relational statements</div>
+          </div>
+          <div class="metric-card p-5">
+            <div class="stat-number text-2xl font-bold text-gray-950">227,869</div>
+            <div class="mt-1 text-sm text-gray-500">L1 atomic concepts</div>
+          </div>
+        </div>
+
+        <div class="mt-10 flex flex-wrap justify-center gap-2" role="tablist" aria-label="ProDalib views">
+          <button class="tab-btn rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700"
+            type="button" data-tab="overview" aria-selected="true">Specification</button>
+          <button class="tab-btn rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700"
+            type="button" data-tab="corpus" aria-selected="false">Curation</button>
+          <button class="tab-btn rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700"
+            type="button" data-tab="sft" aria-selected="false">SFT Data</button>
+        </div>
+
+        <div id="prodalibPanel" class="mt-8"></div>
+      </div>
+    </section>
+
+    <section id="benchmark" class="section-anchor bg-white px-4 py-16 md:py-20">
+      <div class="mx-auto max-w-7xl">
+        <div class="grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
+          <div>
+            <p class="text-sm font-semibold uppercase tracking-[0.16em] text-blue-700">ProDa-16 Benchmark</p>
+            <h2 class="mt-3 text-3xl font-bold tracking-tight text-gray-950 md:text-4xl">Executable tests for the
+              data-debugging loop</h2>
+            <p class="mt-5 text-lg leading-8 text-gray-600">
+              ProDa-16 spans 16 disciplines across natural sciences, engineering, biomedicine, and social and
+              professional sciences. Because it is generated from the same knowledge structure as training data,
+              failures can be traced back to specific concepts, relations, or reasoning chains.
+            </p>
+            <div class="mt-6 grid gap-3 sm:grid-cols-3">
+              <div class="metric-card p-4">
+                <div class="stat-number text-2xl font-bold text-gray-950">0.847</div>
+                <div class="text-xs text-gray-500">mean Spearman rank correlation</div>
+              </div>
+              <div class="metric-card p-4">
+                <div class="stat-number text-2xl font-bold text-gray-950">0.943</div>
+                <div class="text-xs text-gray-500">GPQA correlation</div>
+              </div>
+              <div class="metric-card p-4">
+                <div class="stat-number text-2xl font-bold text-gray-950">0.905</div>
+                <div class="text-xs text-gray-500">MMLU-Pro correlation</div>
+              </div>
+            </div>
+          </div>
+          <button class="figure-frame block w-full p-3" type="button"
+            data-figure="images/proda/figures/proda_16_benchmark.png"
+            data-title="Meta-evaluation of the ProDa-16 benchmark">
+            <img class="mx-auto max-h-[560px] w-full object-contain" src="images/proda/figures/proda_16_benchmark.png"
+              alt="Meta-evaluation of the ProDa-16 benchmark" />
+          </button>
+        </div>
+
+        <div class="mx-auto mt-10 max-w-5xl">
+          <div class="figure-frame p-5">
+            <h3 class="text-lg font-bold text-gray-950">Correlation with established benchmarks</h3>
+            <p class="mt-2 text-sm text-gray-600">A compact web chart for the paper's Figure 3a correlation values; the
+              full benchmark validation figure above contains panels a-c.</p>
+            <div class="mt-4 h-[360px]">
+              <canvas id="correlationChart" aria-label="Benchmark correlation chart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="figure-frame mt-10 overflow-hidden">
+          <div class="border-b border-gray-200 p-5">
+            <h3 class="text-lg font-bold text-gray-950">Table 1. Full benchmark results across all 16 disciplines</h3>
+            <p class="mt-1 text-sm leading-6 text-gray-600">
+              Instruct references, ProDa V1, ProDa V2, and V2-V1 gains. Discipline codes: 001 Physics, 002 Engineering,
+              003 Medicine, 004 Mathematics, 005 Computer Science, 006 Biology, 007 Chemistry, 008 Earth Science, 009
+              Materials Science, 010 Education, 011 Economics, 012 History, 013 Environmental Science, 014 Sociology,
+              015 Psychology, 016 Astronomy.
+            </p>
+          </div>
+          <div id="fullBenchmarkTable" class="overflow-x-auto"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="results" class="section-anchor bg-slate-50 px-4 py-16 md:py-20">
+      <div class="mx-auto max-w-7xl">
+        <div class="mx-auto max-w-4xl text-center">
+          <p class="text-sm font-semibold uppercase tracking-[0.16em] text-blue-700">Results</p>
+          <h2 class="mt-3 text-3xl font-bold tracking-tight text-gray-950 md:text-4xl">Diagnostic repair beats blind
+            scaling</h2>
+          <p class="mt-5 text-lg leading-8 text-gray-600">
+            A first synthesis round produces competitive domain competence, while diagnostic repair closes
+            model-specific gaps with targeted data patches.
+          </p>
+        </div>
+
+        <div class="mt-10">
+          <button class="figure-frame block w-full p-3" type="button"
+            data-figure="images/proda/figures/proda_scaling_performance.png"
+            data-title="Performance comparison of data synthesis methods">
+            <img class="mx-auto max-h-[620px] w-full object-contain"
+              src="images/proda/figures/proda_scaling_performance.png"
+              alt="Performance comparison of data synthesis methods" />
+          </button>
+        </div>
+
+        <div class="mt-10 grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+          <div class="figure-frame overflow-hidden">
+            <div class="border-b border-gray-200 p-5">
+              <h3 class="text-lg font-bold text-gray-950">Reported V1 to V2 gains</h3>
+              <p class="mt-1 text-sm text-gray-600">ProDa-16 average accuracy from the paper source full experimental
+                results table.</p>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full min-w-[640px] text-left text-sm">
+                <thead class="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
+                  <tr>
+                    <th class="px-5 py-3">Model</th>
+                    <th class="px-5 py-3">V1</th>
+                    <th class="px-5 py-3">V2</th>
+                    <th class="px-5 py-3">Gain</th>
+                    <th class="px-5 py-3">Notes</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 text-gray-700">
+                  <tr>
+                    <td class="px-5 py-3 font-semibold text-gray-950">Llama-3.1-8B</td>
+                    <td class="px-5 py-3">30.35%</td>
+                    <td class="px-5 py-3">63.02%</td>
+                    <td class="px-5 py-3 font-semibold text-emerald-700">+32.67</td>
+                    <td class="px-5 py-3">largest reported gain</td>
+                  </tr>
+                  <tr>
+                    <td class="px-5 py-3 font-semibold text-gray-950">Qwen-2.5-3B</td>
+                    <td class="px-5 py-3">50.42%</td>
+                    <td class="px-5 py-3">67.87%</td>
+                    <td class="px-5 py-3 font-semibold text-emerald-700">+17.45</td>
+                    <td class="px-5 py-3">substantial repair effect</td>
+                  </tr>
+                  <tr>
+                    <td class="px-5 py-3 font-semibold text-gray-950">Qwen-2.5-7B</td>
+                    <td class="px-5 py-3">65.86%</td>
+                    <td class="px-5 py-3">70.79%</td>
+                    <td class="px-5 py-3 font-semibold text-emerald-700">+4.93</td>
+                    <td class="px-5 py-3">used in scaling comparison</td>
+                  </tr>
+                  <tr>
+                    <td class="px-5 py-3 font-semibold text-gray-950">Qwen-2.5-14B</td>
+                    <td class="px-5 py-3">70.12%</td>
+                    <td class="px-5 py-3">76.30%</td>
+                    <td class="px-5 py-3 font-semibold text-emerald-700">+6.18</td>
+                    <td class="px-5 py-3">mid-scale gain</td>
+                  </tr>
+                  <tr>
+                    <td class="px-5 py-3 font-semibold text-gray-950">Qwen-2.5-32B</td>
+                    <td class="px-5 py-3">76.54%</td>
+                    <td class="px-5 py-3">78.84%</td>
+                    <td class="px-5 py-3 font-semibold text-emerald-700">+2.30</td>
+                    <td class="px-5 py-3">high absolute score</td>
+                  </tr>
+                  <tr>
+                    <td class="px-5 py-3 font-semibold text-gray-950">Qwen-3-14B</td>
+                    <td class="px-5 py-3">76.44%</td>
+                    <td class="px-5 py-3">77.21%</td>
+                    <td class="px-5 py-3 font-semibold text-emerald-700">+0.77</td>
+                    <td class="px-5 py-3">smaller gain from stronger base</td>
+                  </tr>
+                  <tr>
+                    <td class="px-5 py-3 font-semibold text-gray-950">Qwen-3-32B</td>
+                    <td class="px-5 py-3">77.35%</td>
+                    <td class="px-5 py-3">79.52%</td>
+                    <td class="px-5 py-3 font-semibold text-emerald-700">+2.17</td>
+                    <td class="px-5 py-3">highest reported V2 score</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="metric-card border-t-4 border-t-[#ED8D5A] bg-white p-7">
+            <i data-lucide="target" class="h-8 w-8 text-amber-700"></i>
+            <h3 class="mt-5 text-2xl font-bold text-gray-950">Key takeaway</h3>
+            <p class="mt-4 leading-8 text-gray-600">
+              Diagnostic-driven targeted data is more effective than blindly scaling synthetic data. ProDa V2 reaches
+              68.72% with 1K targeted repair samples and peaks at 72.11% at the 5K scale in the reported
+              Qwen2.5-7B comparison.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="case-studies" class="section-anchor bg-white px-4 py-16 md:py-20">
+      <div class="mx-auto max-w-7xl">
+        <div class="mx-auto max-w-4xl text-center">
+          <p class="text-sm font-semibold uppercase tracking-[0.16em] text-blue-700">Case studies</p>
+          <h2 class="mt-3 text-3xl font-bold tracking-tight text-gray-950 md:text-4xl">Failures become traceable repair
+            tasks</h2>
+        </div>
+        <div class="mt-10 grid gap-6 md:grid-cols-3">
+          <article class="metric-card p-6 text-left">
+            <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Physics</p>
+            <h3 class="mt-3 text-xl font-bold text-gray-950">Fresnel half-wave zone method</h3>
+            <p class="mt-3 text-sm leading-6 text-gray-600">Diagnoses a concept gap around the uncancelled Fresnel zone
+              and repairs the intensity reasoning.</p>
+          </article>
+          <article class="metric-card p-6 text-left">
+            <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Economics and Law</p>
+            <h3 class="mt-3 text-xl font-bold text-gray-950">WTO Japan Varietals</h3>
+            <p class="mt-3 text-sm leading-6 text-gray-600">Separates proposals from panel findings and reconstructs the
+              relevant SPS Agreement reasoning chain.</p>
+          </article>
+          <article class="metric-card p-6 text-left">
+            <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Medicine</p>
+            <h3 class="mt-3 text-xl font-bold text-gray-950">Hyperkalemia ECG manifestations</h3>
+            <p class="mt-3 text-sm leading-6 text-gray-600">Repairs the biophysical mechanism behind sustained
+              depolarization and sodium-channel inactivation.</p>
+          </article>
+        </div>
+        <button class="figure-frame mt-10 block w-full p-3" type="button"
+          data-figure="images/proda/figures/case_study.png" data-title="ProDa diagnostic repair case studies">
+          <img class="h-auto w-full object-contain" src="images/proda/figures/case_study.png"
+            alt="ProDa diagnostic repair case studies" />
+        </button>
+      </div>
+    </section>
+
+    <section id="studio" class="section-anchor bg-slate-50 px-4 py-16 md:py-20">
+      <div class="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
+        <div>
+          <p class="text-sm font-semibold uppercase tracking-[0.16em] text-blue-700">ProDa Studio</p>
+          <h2 class="mt-3 text-3xl font-bold tracking-tight text-gray-950 md:text-4xl">An integrated environment for
+            applying ProDa to new corpora</h2>
+          <p class="mt-5 text-lg leading-8 text-gray-600">
+            ProDa Studio organizes the workflow from knowledge extraction to benchmark generation, fine-tuning data
+            generation, model training, evaluation, and the next diagnostic cycle.
+          </p>
+          <div class="mt-6 space-y-3">
+            <div class="flex gap-3"><i data-lucide="layers-3" class="mt-1 h-5 w-5 text-blue-700"></i>
+              <p class="text-sm leading-6 text-gray-700">Extract Knowledge Core from L3 chains, L2 statements, and L1
+                concepts.</p>
+            </div>
+            <div class="flex gap-3"><i data-lucide="list-checks" class="mt-1 h-5 w-5 text-blue-700"></i>
+              <p class="text-sm leading-6 text-gray-700">Generate benchmark and fine-tuning instances with linked
+                knowledge nodes.</p>
+            </div>
+            <div class="flex gap-3"><i data-lucide="activity" class="mt-1 h-5 w-5 text-blue-700"></i>
+              <p class="text-sm leading-6 text-gray-700">Track fine-tuning loss, learning-rate curves, and
+                per-discipline evaluation.</p>
+            </div>
+            <div class="flex gap-3"><i data-lucide="refresh-cw" class="mt-1 h-5 w-5 text-blue-700"></i>
+              <p class="text-sm leading-6 text-gray-700">Start the next diagnostic repair cycle from observed failures.
+              </p>
+            </div>
+          </div>
+        </div>
+        <button class="figure-frame block w-full p-3" type="button" data-figure="images/proda/figures/proda_studio.png"
+          data-title="ProDa Studio interface">
+          <img class="mx-auto max-h-[640px] w-full object-contain" src="images/proda/figures/proda_studio.png"
+            alt="ProDa Studio interface" />
+        </button>
+      </div>
+    </section>
+
+    <section id="citation" class="section-anchor bg-white px-4 py-16">
+      <div class="mx-auto max-w-5xl">
+        <h2 class="text-3xl font-bold tracking-tight text-gray-950">Citation</h2>
+        <p class="mt-3 text-sm text-gray-600">Draft citation. Verify final author list, venue, arXiv identifier, and URL
+          before publishing.</p>
+        <pre class="mt-6 overflow-x-auto rounded-md bg-gray-950 p-5 text-sm leading-6 text-gray-100"><code>@misc{pan2026programmingdatatestdrivendata,
+          title={Programming with Data: Test-Driven Data Engineering for Self-Improving LLMs from Raw Corpora}, 
+          author={Chenkai Pan and Xinglong Xu and Yuhang Xu and Yujun Wu and Siyuan Li and Jintao Chen and Conghui He and Jingxuan Wei and Cheng Tan},
+          year={2026},
+          eprint={2604.24819},
+          archivePrefix={arXiv},
+          primaryClass={cs.SE},
+          url={https://arxiv.org/abs/2604.24819}
+}</code></pre>
+      </div>
+    </section>
+  </main>
+
+  <footer class="border-t border-gray-200 bg-slate-50 px-4 py-10">
+    <div class="mx-auto flex max-w-7xl flex-col gap-6 md:flex-row md:items-center md:justify-between">
+      <div>
+        <div class="text-lg font-bold text-gray-950">ProDa</div>
+        <p class="mt-1 text-sm text-gray-500">Programming with Data for closed-loop LLM data engineering.</p>
+      </div>
+      <div class="flex flex-wrap items-center gap-6">
+        <img src="images/proda/logos/shlab.png" alt="Shanghai Artificial Intelligence Laboratory"
+          class="max-h-10 max-w-[180px] object-contain" />
+        <img src="images/proda/logos/opendatalab.png" alt="OpenDataLab" class="max-h-10 max-w-[180px] object-contain" />
+      </div>
+    </div>
+  </footer>
+
+  <div id="modal" class="fixed inset-0 z-[100] hidden bg-black/70 p-4 backdrop-blur-sm" role="dialog" aria-modal="true"
+    aria-labelledby="modalTitle">
+    <div class="mx-auto flex h-full max-w-6xl flex-col rounded-lg bg-white shadow-2xl">
+      <div class="flex items-center justify-between border-b border-gray-200 px-5 py-4">
+        <h2 id="modalTitle" class="text-lg font-bold text-gray-950">Figure</h2>
+        <button id="modalClose"
+          class="inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100"
+          type="button" aria-label="Close modal">
+          <i data-lucide="x" class="h-5 w-5"></i>
+        </button>
+      </div>
+      <div id="modalBody" class="min-h-0 flex-1 overflow-auto p-5"></div>
+    </div>
+  </div>
+
+  <script>
+    const prodalibTabs = {
+      overview: {
+        title: "Structured knowledge from raw corpora",
+        text: "ProDalib turns raw educational corpora into a traceable three-level knowledge structure. The visualization summarizes corpus distillation, representative L3-L2-L1 graph structure, and per-discipline scale and connectivity.",
+        images: [
+          ["images/proda/figures/results_specification.png", "Structured knowledge from raw corpora"]
+        ]
+      },
+      corpus: {
+        title: "Corpus curation diagnostics",
+        text: "These views show how the source corpus is filtered and characterized before knowledge extraction, covering discipline and academic-level distribution, reasoning-type composition, and chunk-quality score distributions.",
+        images: [
+          ["images/proda/figures/prodalib_domain_stat.png", "Corpus curation diagnostics"],
+          ["images/proda/figures/prodalib_reasoning.png", "Corpus curation diagnostics"],
+          ["images/proda/figures/prodalib_score_distribution.png", "Corpus curation diagnostics"]
+        ]
+      },
+      sft: {
+        title: "SFT data composition",
+        text: "The first-pass training corpus mixes open-ended, single-choice, true-false, and multiple-choice samples to cover both factual knowledge and relational reasoning signals.",
+        images: [
+          ["images/proda/figures/sft_v1_question_type_pie.png", "SFT data composition"]
+        ]
+      }
+    };
+
+    const fullBenchmarkPanels = [
+      {
+        title: "Panel A: Instruct Models (Upper Bound Reference)",
+        rows: [
+          ["GPT-5.4", "70.40", "70.10", "68.10", "64.80", "71.40", "69.60", "65.90", "73.20", "71.30", "77.83", "73.80", "75.10", "76.90", "82.86", "80.23", "58.00", "71.85"],
+          ["Gemini-3-flash", "75.80", "73.60", "73.60", "68.80", "76.40", "75.20", "71.20", "75.50", "75.30", "82.22", "80.50", "80.00", "79.50", "87.46", "85.45", "65.00", "76.60"],
+          ["DeepSeekv3.2", "75.20", "75.40", "73.90", "71.80", "74.70", "75.00", "70.60", "77.00", "75.70", "82.68", "77.90", "82.20", "79.50", "85.51", "83.41", "66.50", "76.69"],
+          ["Llama-3.1-8B", "54.80", "58.40", "60.70", "50.60", "59.10", "59.90", "54.60", "60.70", "58.70", "66.40", "63.00", "66.60", "67.30", "72.79", "65.23", "59.00", "60.65"],
+          ["Qwen-2.5-3B", "53.80", "57.10", "57.30", "49.10", "56.10", "57.30", "49.10", "59.20", "53.90", "63.39", "60.40", "67.50", "63.90", "67.49", "62.73", "53.50", "57.99"],
+          ["Qwen-2.5-7B", "58.40", "60.90", "57.60", "58.00", "59.50", "58.40", "52.70", "62.60", "56.70", "73.56", "67.10", "69.70", "68.70", "73.50", "71.36", "49.50", "62.31"],
+          ["Qwen-2.5-14B", "71.80", "74.50", "71.40", "68.00", "72.50", "72.10", "67.30", "74.40", "71.40", "82.45", "76.90", "78.90", "79.70", "83.22", "81.59", "66.00", "74.36"],
+          ["Qwen-2.5-32B", "71.60", "71.50", "69.30", "68.80", "72.90", "70.90", "66.10", "73.20", "72.00", "80.95", "77.00", "77.90", "78.80", "81.63", "83.64", "64.00", "73.61"],
+          ["Qwen-3-4B", "47.10", "48.90", "54.10", "45.60", "52.70", "53.80", "44.40", "54.30", "47.20", "67.09", "59.10", "63.20", "62.90", "69.26", "65.00", "47.50", "54.62"],
+          ["Qwen-3-30B-A3B", "73.60", "72.40", "70.20", "68.90", "73.90", "72.20", "66.50", "73.50", "71.40", "81.87", "78.70", "77.20", "79.20", "82.51", "81.36", "60.50", "74.13"]
+        ]
+      },
+      {
+        title: "Panel B: Base Models - Round 2 (Initial Fine-Tuning / ProDa V1)",
+        rows: [
+          ["Llama-3.1-8B", "27.80", "29.00", "29.00", "23.10", "29.10", "30.80", "26.10", "32.10", "27.30", "33.03", "30.00", "38.00", "35.20", "39.75", "28.64", "29.50", "30.35"],
+          ["Qwen-2.5-3B", "52.10", "51.50", "49.30", "47.70", "46.90", "49.00", "43.70", "49.00", "45.30", "55.20", "51.90", "55.50", "53.30", "59.19", "51.14", "53.00", "50.42"],
+          ["Qwen-2.5-7B", "64.60", "65.00", "63.00", "63.00", "63.40", "64.60", "60.60", "65.70", "61.30", "74.02", "66.40", "71.00", "70.00", "74.03", "67.50", "62.50", "65.86"],
+          ["Qwen-2.5-14B", "68.70", "70.80", "65.20", "64.70", "66.30", "68.30", "67.40", "69.20", "67.70", "76.79", "73.60", "73.70", "74.80", "76.15", "77.50", "63.50", "70.12"],
+          ["Qwen-2.5-32B", "75.20", "75.90", "73.10", "73.80", "74.50", "73.30", "73.80", "75.50", "74.20", "81.99", "80.90", "79.40", "79.40", "82.69", "81.59", "72.00", "76.54"],
+          ["Qwen-3-4B", "65.40", "65.30", "60.00", "62.80", "63.20", "63.00", "62.80", "63.40", "61.40", "73.33", "69.50", "68.70", "71.60", "71.02", "74.77", "60.50", "65.79"],
+          ["Qwen-3-8B", "70.80", "71.70", "68.60", "68.50", "68.00", "72.00", "68.50", "73.60", "68.30", "77.71", "75.20", "75.10", "75.70", "79.51", "79.55", "67.50", "72.25"],
+          ["Qwen-3-14B", "76.00", "76.00", "73.10", "70.90", "74.60", "74.70", "73.50", "77.40", "73.10", "82.68", "79.50", "79.50", "78.90", "82.16", "81.59", "72.50", "76.44"],
+          ["Qwen-3-32B", "76.90", "76.50", "75.70", "71.50", "75.90", "77.30", "73.60", "76.50", "74.90", "82.45", "78.70", "81.60", "80.50", "84.10", "80.68", "72.00", "77.35"]
+        ]
+      },
+      {
+        title: "Panel C: Base Models - Round 3 (Iterative Knowledge Injection and Scaffolding / ProDa V2)",
+        rows: [
+          ["Llama-3.1-8B", "59.60", "65.90", "59.80", "56.80", "55.60", "61.70", "58.90", "63.20", "60.80", "68.71", "66.00", "72.10", "68.40", "69.79", "64.32", "53.50", "63.02"],
+          ["Qwen-2.5-3B", "65.20", "67.10", "65.50", "61.70", "61.40", "65.60", "60.60", "67.30", "64.50", "74.71", "70.30", "75.30", "76.10", "77.03", "76.14", "63.00", "67.87"],
+          ["Qwen-2.5-7B", "71.20", "69.60", "68.20", "66.30", "69.80", "67.30", "64.90", "68.20", "68.70", "76.44", "74.30", "75.00", "76.40", "78.09", "75.45", "63.50", "70.79"],
+          ["Qwen-2.5-14B", "76.00", "76.00", "74.90", "72.10", "73.00", "74.50", "72.00", "75.20", "75.30", "80.48", "78.70", "80.10", "79.50", "83.22", "81.82", "68.00", "76.30"],
+          ["Qwen-2.5-32B", "77.40", "77.80", "74.20", "73.00", "76.50", "77.30", "75.30", "80.50", "76.20", "84.64", "82.50", "82.40", "81.80", "86.22", "86.59", "71.50", "78.84"],
+          ["Qwen-3-4B", "66.00", "66.20", "63.60", "62.00", "63.10", "65.60", "60.60", "67.80", "64.80", "75.87", "70.60", "72.50", "73.80", "76.68", "74.77", "53.50", "67.46"],
+          ["Qwen-3-8B", "73.70", "74.20", "71.60", "70.90", "73.50", "75.50", "70.50", "75.90", "73.80", "82.45", "78.80", "80.70", "80.80", "84.98", "82.50", "66.50", "75.97"],
+          ["Qwen-3-14B", "75.40", "75.80", "74.70", "70.00", "73.50", "77.60", "72.10", "77.80", "76.00", "83.26", "80.60", "81.30", "81.70", "83.92", "85.00", "65.50", "77.21"],
+          ["Qwen-3-32B", "77.40", "79.30", "77.50", "72.40", "77.60", "79.60", "75.40", "79.30", "79.00", "84.87", "81.60", "84.20", "82.20", "86.93", "85.23", "67.00", "79.52"]
+        ]
+      },
+      {
+        title: "Panel D: Performance Gain (Round 3 - Round 2)",
+        gain: true,
+        rows: [
+          ["Llama-3.1-8B", "+31.80", "+36.90", "+30.80", "+33.70", "+26.50", "+30.90", "+32.80", "+31.10", "+33.50", "+35.68", "+36.00", "+34.10", "+33.20", "+30.04", "+35.68", "+24.00", "+32.67"],
+          ["Qwen-2.5-3B", "+13.10", "+15.60", "+16.20", "+14.00", "+14.50", "+16.60", "+16.90", "+18.30", "+19.20", "+19.51", "+18.40", "+19.80", "+22.80", "+17.84", "+25.00", "+10.00", "+17.45"],
+          ["Qwen-2.5-7B", "+6.60", "+4.60", "+5.20", "+3.30", "+6.40", "+2.70", "+4.30", "+2.50", "+7.40", "+2.42", "+7.90", "+4.00", "+6.40", "+4.06", "+7.95", "+1.00", "+4.93"],
+          ["Qwen-2.5-14B", "+7.30", "+5.20", "+9.70", "+7.40", "+6.70", "+6.20", "+4.60", "+6.00", "+7.60", "+3.69", "+5.10", "+6.40", "+4.70", "+7.07", "+4.32", "+4.50", "+6.18"],
+          ["Qwen-2.5-32B", "+2.20", "+1.90", "+1.10", "-0.80", "+2.00", "+4.00", "+1.50", "+5.00", "+2.00", "+2.65", "+1.60", "+3.00", "+2.40", "+3.53", "+5.00", "-0.50", "+2.30"],
+          ["Qwen-3-4B", "+0.60", "+0.90", "+3.60", "-0.80", "-0.10", "+2.60", "-2.20", "+4.40", "+3.40", "+2.54", "+1.10", "+3.80", "+2.20", "+5.66", "+0.00", "-7.00", "+1.67"],
+          ["Qwen-3-8B", "+2.90", "+2.50", "+3.00", "+2.40", "+5.50", "+3.50", "+2.00", "+2.30", "+5.50", "+4.74", "+3.60", "+5.60", "+5.10", "+5.47", "+2.95", "-1.00", "+3.72"],
+          ["Qwen-3-14B", "-0.60", "-0.20", "+1.60", "-0.90", "-1.10", "+2.90", "-1.40", "+0.40", "+2.90", "+0.58", "+1.10", "+1.80", "+2.80", "+1.76", "+3.41", "-7.00", "+0.77"],
+          ["Qwen-3-32B", "+0.50", "+2.80", "+1.80", "+0.90", "+1.70", "+2.30", "+1.80", "+2.80", "+4.10", "+2.42", "+2.90", "+2.60", "+1.70", "+2.83", "+4.55", "-5.00", "+2.17"]
+        ]
+      }
+    ];
+
+    function renderFullBenchmarkTable() {
+      const target = document.getElementById("fullBenchmarkTable");
+      if (!target) {
+        return;
+      }
+      const headers = ["Model", "001", "002", "003", "004", "005", "006", "007", "008", "009", "010", "011", "012", "013", "014", "015", "016", "Avg"];
+      const headerHtml = headers.map((header, index) => `<th class="${index === 0 ? "text-left" : "text-right"} px-3 py-3">${header}</th>`).join("");
+      const bodyHtml = fullBenchmarkPanels.map((panel) => {
+        const rows = panel.rows.map((row) => {
+          const cells = row.map((cell, index) => {
+            const avgClass = index === row.length - 1 ? (panel.gain ? "font-bold text-emerald-700" : "font-bold text-gray-950") : "";
+            const alignClass = index === 0 ? "text-left font-semibold text-gray-950" : "text-right";
+            return `<td class="px-3 py-3 ${alignClass} ${avgClass}">${cell}</td>`;
+          }).join("");
+          return `<tr>${cells}</tr>`;
+        }).join("");
+        return `<tr class="bg-gray-50"><td class="px-3 py-3 text-left font-semibold text-gray-950" colspan="18">${panel.title}</td></tr>${rows}`;
+      }).join("");
+      target.innerHTML = `
+          <table class="w-full min-w-[1680px] text-xs">
+            <thead class="bg-gray-50 uppercase tracking-wide text-gray-500"><tr>${headerHtml}</tr></thead>
+            <tbody class="divide-y divide-gray-200 text-gray-700">${bodyHtml}</tbody>
+          </table>
+        `;
+    }
+
+    function renderProdalibTab(tabId) {
+      const tab = prodalibTabs[tabId];
+      const visual = tab.images.length === 1 ? `
+          <button class="figure-frame mx-auto block w-full max-w-6xl p-3" type="button" data-figure="${tab.images[0][0]}" data-title="${tab.images[0][1]}">
+            <img class="h-auto w-full object-contain" src="${tab.images[0][0]}" alt="${tab.images[0][1]}" />
+          </button>
+        ` : `
+          <div class="mx-auto w-full max-w-6xl">
+            <div class="figure-frame relative p-3">
+              <button class="carousel-prev absolute left-5 top-1/2 z-10 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-md border border-gray-300 bg-white text-gray-700 transition hover:bg-gray-50" type="button" aria-label="Previous data view">
+                  <i data-lucide="chevron-left" class="h-5 w-5"></i>
+              </button>
+              <button class="carousel-figure block w-full" type="button" data-figure="${tab.images[0][0]}" data-title="${tab.images[0][1]}">
+                <img id="prodalibCarouselImage" class="h-auto w-full object-contain" src="${tab.images[0][0]}" alt="${tab.images[0][1]}" />
+              </button>
+              <button class="carousel-next absolute right-5 top-1/2 z-10 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-md border border-gray-300 bg-white text-gray-700 transition hover:bg-gray-50" type="button" aria-label="Next data view">
+                  <i data-lucide="chevron-right" class="h-5 w-5"></i>
+              </button>
+            </div>
+            <div class="carousel-dots mt-4 flex justify-center gap-2" aria-label="Data view selector">
+              ${tab.images.map((_, index) => `<button class="h-2.5 w-2.5 rounded-full border border-gray-300 ${index === 0 ? "bg-blue-700" : "bg-white"}" type="button" data-slide="${index}" aria-label="Show data view ${index + 1}"></button>`).join("")}
+            </div>
+          </div>
+        `;
+      document.getElementById("prodalibPanel").innerHTML = `
+          <div class="space-y-8">
+            <div class="metric-card mx-auto max-w-5xl p-7 text-center">
+              <h3 class="text-2xl font-bold text-gray-950">${tab.title}</h3>
+              <p class="mt-4 leading-8 text-gray-600">${tab.text}</p>
+            </div>
+            ${visual}
+          </div>
+        `;
+      const panel = document.getElementById("prodalibPanel");
+      if (tab.images.length > 1) {
+        initProdalibCarousel(panel, tab.images);
+      }
+      bindFigureButtons(panel);
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+    }
+
+    function initProdalibCarousel(root, images) {
+      let activeIndex = 0;
+      const figureButton = root.querySelector(".carousel-figure");
+      const image = root.querySelector("#prodalibCarouselImage");
+      const dots = Array.from(root.querySelectorAll("[data-slide]"));
+
+      function showSlide(index) {
+        activeIndex = (index + images.length) % images.length;
+        const [src, title] = images[activeIndex];
+        figureButton.dataset.figure = src;
+        figureButton.dataset.title = title;
+        image.src = src;
+        image.alt = title;
+        dots.forEach((dot, dotIndex) => {
+          dot.classList.toggle("bg-blue-700", dotIndex === activeIndex);
+          dot.classList.toggle("bg-white", dotIndex !== activeIndex);
+        });
+      }
+
+      root.querySelector(".carousel-prev").addEventListener("click", () => showSlide(activeIndex - 1));
+      root.querySelector(".carousel-next").addEventListener("click", () => showSlide(activeIndex + 1));
+      dots.forEach((dot) => {
+        dot.addEventListener("click", () => showSlide(Number(dot.dataset.slide)));
+      });
+    }
+
+    function openModal(title, content) {
+      const modal = document.getElementById("modal");
+      document.getElementById("modalTitle").textContent = title;
+      document.getElementById("modalBody").innerHTML = content;
+      modal.classList.remove("hidden");
+      document.body.classList.add("modal-open");
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+    }
+
+    function closeModal() {
+      document.getElementById("modal").classList.add("hidden");
+      document.body.classList.remove("modal-open");
+    }
+
+    function bindFigureButtons(root = document) {
+      root.querySelectorAll("[data-figure]").forEach((button) => {
+        if (button.dataset.figureBound === "true") {
+          return;
+        }
+        button.dataset.figureBound = "true";
+        button.addEventListener("click", () => {
+          const src = button.dataset.figure;
+          const title = button.dataset.title || "Figure";
+          openModal(title, `<img class="mx-auto max-h-none w-full object-contain" src="${src}" alt="${title}" />`);
+        });
+      });
+    }
+
+    function initCorrelationChart() {
+      const canvas = document.getElementById("correlationChart");
+      if (!canvas || !window.Chart) {
+        return;
+      }
+      new Chart(canvas, {
+        type: "bar",
+        data: {
+          labels: ["GPQA", "MMLU-Pro", "MUSR", "GSM8K-COT", "BBH", "TruthfulQA", "HumanEval+", "MBPP+", "MATH-COT", "SuperGPQA", "IFEval"],
+          datasets: [{
+            label: "Spearman correlation",
+            data: [0.943, 0.905, 0.867, 0.857, 0.854, 0.829, 0.821, 0.821, 0.821, 0.800, 0.800],
+            backgroundColor: "#4198AC",
+            borderRadius: 4
+          }]
+        },
+        options: {
+          maintainAspectRatio: false,
+          responsive: true,
+          indexAxis: "y",
+          scales: {
+            x: { min: 0.75, max: 1.0, grid: { color: "#E2E8F0" } },
+            y: { grid: { display: false } }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: (context) => `rho = ${context.raw}` } }
+          }
+        }
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+
+      const mobileButton = document.getElementById("mobileMenuButton");
+      const mobileMenu = document.getElementById("mobileMenu");
+      mobileButton.addEventListener("click", () => {
+        const isHidden = mobileMenu.classList.toggle("hidden");
+        mobileButton.setAttribute("aria-expanded", String(!isHidden));
+      });
+      mobileMenu.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", () => {
+          mobileMenu.classList.add("hidden");
+          mobileButton.setAttribute("aria-expanded", "false");
+        });
+      });
+
+      document.querySelectorAll(".tab-btn").forEach((button) => {
+        button.addEventListener("click", () => {
+          document.querySelectorAll(".tab-btn").forEach((item) => item.setAttribute("aria-selected", "false"));
+          button.setAttribute("aria-selected", "true");
+          renderProdalibTab(button.dataset.tab);
+        });
+      });
+
+      document.getElementById("modalClose").addEventListener("click", closeModal);
+      document.getElementById("modal").addEventListener("click", (event) => {
+        if (event.target.id === "modal") {
+          closeModal();
+        }
+      });
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          closeModal();
+        }
+      });
+
+      renderProdalibTab("overview");
+      renderFullBenchmarkTable();
+      bindFigureButtons();
+      initCorrelationChart();
+    });
+  </script>
+</body>
+
+</html>
